@@ -1,6 +1,10 @@
 name: api
-auth: bearer
+auth: SecurityScheme
+auth-schemes:
+  SecurityScheme:
+    header: PX-API-KEY
+    type: string
 environments:
-  Production: https://api.example.com
-  Sandbox: https://sandbox.example.com
+  Production: https://api.packagex.io
+  Sandbox: https://api.packagex.io
 default-environment: Production

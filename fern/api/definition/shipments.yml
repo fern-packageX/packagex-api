@@ -1,0 +1,417 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+service:
+  auth: true
+  base-path: /v1/shipments
+  endpoints:
+    create:
+      path: ""
+      docs: Gets shipping rates for a new shipment.
+      method: POST
+      request: CreateShipmentRequest
+      response: ShipmentResponse
+
+    list:
+      docs: Lists shipments up to the specified limit starting at the specified page
+      path: ""
+      method: GET
+      response: ShipmentResponse
+
+    retrieve:
+      docs: Retrieves a specific shipment
+      method: GET
+      path: /{shipment}
+      path-parameters:
+        shipment: string
+      response: ShipmentResponse
+
+    purchase:
+      docs: Purchases a shipping label
+      method: POST
+      path: /{shipment}
+      path-parameters:
+        shipment: string
+      response: ShipmentResponse
+
+types:
+  Response:
+    docs: An error response
+    properties:
+      status:
+        docs: A 2XX code
+        type: integer
+      message:
+        docs: A human readable message to display to an end user
+        type: string
+      error_code:
+        type: string
+        docs: The developer code for the issue that occurred.
+      errors:
+        docs: An list of errors that occurred. Normally will be of the properties that failed validation.
+        type: list<string>
+      pagination: Pagination
+      events:
+        docs: All of the events that were triggered due to this request
+        type: list<string>
+      endpoint:
+        docs: The endpoint that was hit
+        type: string
+
+  Pagination:
+    docs: The pagination object returned in responses where multiple values are returned
+    properties:
+      limit:
+        type: integer
+        docs: The limit for the responses
+      page:
+        type: integer
+        docs: The current page offset that is being retrieved
+      has_more:
+        type: boolean
+        docs: indicates if there are more values in the database not retrieved in this query
+
+  ShipmentResponse:
+    extends: Response
+    properties:
+      data: Shipment
+
+  CreateShipmentRequest:
+    properties:
+      sender: Sender
+      recipient: Recipient
+      parcel: Parcel
+
+  Address:
+    docs: The PackageX address object
+    properties:
+      id:
+        docs: The ID for this address. Can be passed into any address field in the future to retrieve this exact address.
+        type: string
+      hash:
+        docs: Similar to the address ID, the hash is a unique string that identifies the address but without the line2 property.
+        type: string
+      line1:
+        docs: The first line of the street address.
+        type: string
+      line2:
+        docs: The second line of the street address.
+        type: string
+      city:
+        docs: The name of the city.
+        type: string
+      state:
+        docs: The full name of the state.
+        type: string
+      state_code:
+        docs: The abbreviated code for the state if applicable.
+        type: string
+      country:
+        docs: The full name of the country for this address.
+        type: string
+      country_code:
+        docs: The two character country code for this address.
+        type: string
+      postal_code:
+        docs: The postal code for this address.
+        type: string
+      formatted_address:
+        docs: The full text string of the address.
+        type: string
+      textarea:
+        docs: The full text string of the address without the line2 address. This is useful if using address auto complete that does not provide a line2 address which would be asked for in a separate input field.
+        type: string
+      timezone:
+        docs: The timezone for this address
+        type: string
+      verified:
+        docs: If we have verified this address
+        type: boolean
+      latitude:
+        docs: The latitude coordinate
+        type: integer
+      longitude:
+        docs: The longitude coordinate
+        type: integer
+
+  Rate:
+    docs: The shipping rate object showing the service level, price, and shipping provider information
+    properties:
+      id:
+        docs: The ID for this rate. To purchase a shipping label after getting rates, you will pass in this rate to indicate you wish to purchase it
+        type: string
+      amount:
+        docs: The amount that will be collected from a customer. This includes any upcharges or discounts you have added to the price on the PackageX Dashboard.
+        type: integer
+      billed_amount:
+        docs: The amount that your organization will be billed for this rate.
+        type: integer
+      carrier_account:
+        docs: The custom rate card that was used for this transaction. Should be null for all organizations currently.
+        type: string
+      pickup_at:
+        docs: Time in epoch seconds when this shipment will be picked up, if that is included in the service of this rate. Will be null otherwise.
+        type: integer
+      provider: Provider
+      service_level: ServiceLevel
+
+  ServiceLevel:
+    docs: The service level for this rate
+    properties:
+      name:
+        docs: The human readable name for this service label
+        type: string
+      id:
+        docs: The unique ID of this provider's service level
+        type: string
+      terms:
+        docs: The human readable delivery estimate for this rate
+        type: string
+      days:
+        docs: The integer of days that this delivery is estimated to take if the provider receives the shipment before their daily cutoff time.
+        type: integer
+      estimated_delivery:
+        docs: The time in epoch seconds when we estimate the shipment at this rate will be delivered
+        type: integer
+
+  Provider:
+    docs: Details about a shipping provider for a given rate or shipment
+    properties:
+      name:
+        docs: The name of the provider
+        type: string
+      id:
+        docs: Unique ID of the provider
+        type: string
+      logo_url:
+        docs: The url for the provider's logo
+        type: string
+      support_email:
+        docs: The contact email provided by the shipping provider
+        type: string
+      support_phone:
+        docs: The contact phone provided by the shipping provider
+        type: string
+      support_url:
+        docs: The contact website provided by the shipping provider
+        type: string
+      marketplace:
+        docs: If this shipping provider came from the PackageX marketplace. Typically large providers like FedEx, UPS, USPS, etc are not from the marketplace and same-day courier are not.
+        type: boolean
+
+  Parcel:
+    docs: A parcel or package that will be included in a shipment
+    properties:
+      length:
+        docs: The length of the package in inches
+        type: integer
+      width:
+        docs: The width of the package in inches
+        type: integer
+      height:
+        docs: The height of the package in inches
+        type: integer
+      weight:
+        docs: The weight of the package in pounds
+        type: integer
+      type:
+        docs: The courier specific packaging. See https://docs.packagex.io/shipments/predefined-packages for more information
+        type: string
+      item_docs:
+        docs: The user provided docs for the package. This is shown the the recipient if using PackageX notifications
+        type: string
+      special_handling:
+        docs: Any special handing instructions provided. Not all shipping providers support these
+        type: string
+        # enum: [confidential, fragile, urgent, perishable, legal_document, oversized, dry_ice, batteries, time_sensitive, signature]
+
+  Recipient:
+    docs: The information about the shipment recipient
+    properties:
+      address: Address
+      name:
+        docs: The recipient's name
+        type: string
+      email:
+        docs: The recipient's email
+        type: string
+      phone:
+        docs: The recipient's phone
+        type: string
+
+  Sender:
+    docs: The information about the shipment sender, which is normally the organization using this API
+    properties:
+      address: Address
+      name:
+        docs: The sender's name
+        type: string
+      email:
+        docs: The sender's email
+        type: string
+      phone:
+        docs: The sender's phone
+        type: string
+      logo_url:
+        docs: The sender's logo
+        type: string
+      id:
+        docs: The sender's unique packagex ID
+        type: string
+
+  TrackingUpdate:
+    docs: The record of each tracking update from a shipment
+    properties:
+      address: Address
+      status:
+        docs: The status for this shipment. For all statuses see https://docs.packagex.io/shipments/statuses
+        type: string
+      comment:
+        docs: A shipping provider comment
+        type: string
+      images:
+        docs: Urls of images
+        type: list<string>
+      message:
+        docs: Human readable text explaining the status
+        type: string
+      event:
+        docs: The event that occurred when this event was created. For all events see https://docs.packagex.io/shipments/events
+        type: string
+      created_at:
+        docs: Time from unix eopch seconds when this tracking update was created
+        type: integer
+
+  Shipment:
+    docs: A shipment object
+    properties:
+      amount:
+        docs: The amount that will be collected from a customer. This includes any upcharges or discounts you have added to the price on the PackageX Dashboard.
+        type: integer
+      billed_amount:
+        docs: The amount that your organization will be billed for this rate.
+        type: integer
+      provider:
+        type: Provider
+      created_at:
+        docs: Time in epoch seconds when this shipment was created.
+        type: integer
+      updated_at:
+        docs: Time in epoch seconds when this shipment was last updated.
+        type: integer
+      currency: Currency
+      estimated_delivery:
+        docs: Time in epoch seconds when we estimate the delivery will occur.
+        type: integer
+      has_issue:
+        docs: If this shipment has any existing issue, normally do to the most recent tracking update indicating that there is an issue.
+        type: boolean
+      id:
+        docs: The unique ID for the shipment
+        type: string
+      status:
+        docs: The current status for the shipment. It's the same status as the latest tracking_update just surfaced for convenience. See https://docs.packagex.io/shipments/statuses for more info on statuses.
+        type: string
+      lead_time_hours:
+        docs: The amount of lead time in hours that is required. This is only applicable for same-day shipments and indicated how much advance notice is required between the shipping provider and sender before a courier will be dispatched.
+        type: integer
+      metadata:
+        docs: Custom key value pairs that the organization is able to add to this shipment
+        type: map<string, unknown>
+      paid:
+        docs: If the shipment has been paid for
+        type: boolean
+      parcels:
+        docs: The individual packages that are part of this shipment.
+        type: list<Parcel>
+      payment_reference:
+        docs: A user generated reference for this payment. Will be included in invoices.
+        type: string
+      purchased_rate: Rate
+      rates:
+        docs: All of the rates that were returned when creating this shipment
+        type: list<Rate>
+      recipient: Recipient
+      sender: Sender
+      pickup_at:
+        docs: Seconds from epoch when this shipment will be picked up, if pickup is part of the rate's service level
+        type: integer
+      organization_id:
+        docs: The ID of the organization that owns this shipment
+        type: string
+      label_url:
+        docs: The url for the shipping label
+        type: string
+      invoice_id:
+        docs: The ID of the invoice for this shipment
+        type: string
+      tracking_integer:
+        docs: The tracking integer for this shipment.
+        type: string
+      tracking_url:
+        docs: The url for the end user to track their shipment
+        type: string
+      feedback: ShipmentFeedback
+      tracking_updates:
+        docs: A list of all tracking updates that occurred for this shipment from oldest to newest
+        type: list<TrackingUpdate>
+      latest_location: LatestLocation
+
+  ShipmentFeedback:
+    docs: User provided feedback for this shipment
+    properties:
+      rating: FeedbackRating
+      comment:
+        docs: A comment that the user provided about their experience
+        type: string
+      updated_at:
+        docs: When the feedback was updated in epoch seconds
+        type: integer
+
+  FeedbackRating:
+    type: integer
+
+  LatestLocation:
+    docs: The latest read-time tracking information for this shipment
+    properties:
+      latitude:
+        docs: The latitude coordinate available if the provider is giving real time updates
+        type: integer
+      longitude:
+        docs: The longitude coordinate available if the provider is giving real time updates
+        type: integer
+      updated_at:
+        docs: The last time this live location was updated in epoch seconds
+        type: integer
+      map_url:
+        docs: The url to a map showing the tracking history and current live location
+        type: string
+
+  Currency:
+    docs: The currency used for this shipment.
+    enum:
+      - usd
+  # Error:
+  #   docs: An error response
+  #   properties:
+  #     status:
+  #       docs: A 4XX or 5XX status code indicating the error that occurred
+  #       type: integer
+  #     message:
+  #       docs: A human readable message to display to an end user
+  #       type: string
+  #     error_code:
+  #       type: string
+  #       docs: The developer code for the issue that occurred.
+  #     data:
+  #       type: object
+  #       docs: The data object will be empty on errors
+  #     errors:
+  #       docs: An list of errors that occurred. Normally will be of the properties that failed validation.
+  #       type: list<string>
+  #     pagination: Pagination
+  #     events:
+  #       docs: All of the events that were triggered due to this request
+  #       type: list<string>
+  #     endpoint:
+  #       docs: The endpoint that was hit
+  #       type: string

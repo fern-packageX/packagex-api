@@ -1,5 +1,5 @@
 name: api
-auth: SecurityScheme
+auth: apiKey
 auth-schemes:
   apiKey:
     header: PX-API-KEY

@@ -41,7 +41,7 @@ service:
       examples:
         - path-parameters:
             shipment: ship_czhgjrk5JaVvyATPDbyURp
-          request:
+          request: $PurchaseShippingLabelRequest.Example1
 
 types:
   Response:
@@ -232,6 +232,7 @@ types:
           amount: 1203
           billed_amount: 9023
           service_level: $ServiceLevel.Example1
+          provider: $Provider.Example1
 
   ServiceLevel:
     docs: The service level for this rate
@@ -257,6 +258,7 @@ types:
     examples:
       - name: Example1
         value:
+          id: 3bicjss933jckjcsww
           name: Same Day
           days: 1
           estimated_delivery: 1679591515
@@ -328,7 +330,7 @@ types:
   Parcel:
     docs: A parcel or package that will be included in a shipment
     properties:
-      attributes: list<Attributes>
+      attributes: optional<list<Attributes>>
       id:
         docs: The unique ID assigned to the parcel beginning with prcl_
         type: string
@@ -434,15 +436,35 @@ types:
       created_at:
         docs: Time from unix eopch seconds when this tracking update was created
         type: integer
+      updated_at: 
+        docs: The time in epoch seconds when this status was last updated
+        type: integer
+      location_id: 
+        docs: The ID of the location of this update, if it is one of your locations.
+        type: optional<string>
+      layout_id: 
+        docs: The ID of the layout that this item is on, if it matches one of your locations.
+        type: optional<string>
     examples:
       - name: Example1
         value:
           address: $Address.Example1
           status: in_transit
+          message: In Transit
+          images: []
+          created_at: 1679591515
+          updated_at: 1679591623
+          event: Your package is in transit
+
       - name: Example2
         value:
           address: $Address.Example1
           status: out_for_delivery
+          message: Out for Delivery
+          images: []
+          created_at: 1679591515
+          updated_at: 1679591623
+          event: Your package is out for delivery 
 
   Filters:
     docs: A sudo status given to the delivery to know what is happening with the delivery.
@@ -546,7 +568,7 @@ types:
       id:
         docs: The unique ID for the shipment
         type: string
-      refund_status: RefundStatus
+      refund_status: optional<RefundStatus>
       status: ShipmentStatus
       lead_time_mins:
         docs: The amount of lead time needed to prepare the shipment for an on-demand courier. This is only applicable for same-day shipments and indicated how much advance notice is required between the shipping provider and sender before a courier will be dispatched.
@@ -591,12 +613,12 @@ types:
       tracking_url:
         docs: The url for the end user to track their shipment
         type: string
-      feedback: ShipmentFeedback
+      feedback: optional<ShipmentFeedback>
       tracking_updates:
         docs: A list of all tracking updates that occurred for this shipment from oldest to newest
         type: list<TrackingUpdate>
       coordinates: list<double>
-      _search: Search
+      _search: optional<Search> 
     examples:
       - value:
           amount: 1324
@@ -606,7 +628,7 @@ types:
           updated_at: 1679245933
           currency: usd
           estimated_delivery: 1679591515
-          filters: completed
+          filters: [completed]
           fulfillment_id: efewifb31221
           id: defbei39dkna
           status: out_for_delivery

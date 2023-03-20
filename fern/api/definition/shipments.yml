@@ -722,43 +722,29 @@ types:
       relevance_score:
         docs: A number from 0 - 1 about how relevant the result was to the search query, with 1 being a perfect match.
         type: double
-  # Coordinates:
-  #   docs: The latest read-time tracking information for this shipment
-  #   properties:
-  #     latitude:
-  #       docs: The latitude coordinate available if the provider is giving real time updates
-  #       type: integer
-  #     longitude:
-  #       docs: The longitude coordinate available if the provider is giving real time updates
-  #       type: integer
-  #     updated_at:
-  #       docs: The last time this live location was updated in epoch seconds
-  #       type: integer
-  #     map_url:
-  #       docs: The url to a map showing the tracking history and current live location
-  #       type: string
-  # Error:
-  #   docs: An error response
-  #   properties:
-  #     status:
-  #       docs: A 4XX or 5XX status code indicating the error that occurred
-  #       type: integer
-  #     message:
-  #       docs: A human readable message to display to an end user
-  #       type: string
-  #     error_code:
-  #       type: string
-  #       docs: The developer code for the issue that occurred.
-  #     data:
-  #       type: object
-  #       docs: The data object will be empty on errors
-  #     errors:
-  #       docs: An list of errors that occurred. Normally will be of the properties that failed validation.
-  #       type: list<string>
-  #     pagination: Pagination
-  #     events:
-  #       docs: All of the events that were triggered due to this request
-  #       type: list<string>
-  #     endpoint:
-  #       docs: The endpoint that was hit
-  #       type: string
+
+  Error:
+    docs: An error response
+    properties:
+      status:
+        docs: A 4XX or 5XX status code indicating the error that occurred
+        type: integer
+      message:
+        docs: A human readable message to display to an end user
+        type: string
+      error_code:
+        type: string
+        docs: The developer code for the issue that occurred.
+      data:
+        type: object
+        docs: The data object will be empty on errors
+      errors:
+        docs: An list of errors that occurred. Normally will be of the properties that failed validation.
+        type: list<string>
+      pagination: Pagination
+      events:
+        docs: All of the events that were triggered due to this request
+        type: list<string>
+      endpoint:
+        docs: The endpoint that was hit
+        type: string

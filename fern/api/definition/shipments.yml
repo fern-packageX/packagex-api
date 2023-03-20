@@ -1,5 +1,6 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
-
+imports: 
+  commons: commons.yml
 service:
   auth: true
   base-path: /v1/shipments
@@ -82,28 +83,6 @@ service:
               endpoint: /ship_czhgjrk5JaVvyATPDbyURp
 
 types:
-  Response:
-    docs: An error response
-    properties:
-      status:
-        docs: A 2XX code
-        type: integer
-      message:
-        docs: A human readable message to display to an end user
-        type: string
-      error_code:
-        type: optional<string>
-        docs: The developer code for the issue that occurred.
-      errors:
-        docs: An list of errors that occurred. Normally will be of the properties that failed validation.
-        type: list<string>
-      pagination: optional<Pagination>
-      events:
-        docs: All of the events that were triggered due to this request
-        type: list<string>
-      endpoint:
-        docs: The endpoint that was hit
-        type: string
 
   LabelSize:
     docs: Specify a label size for the returned shipping label. If not included, we'll use the default shipping label size set from the PackageX Dashboard.
@@ -133,7 +112,7 @@ types:
         docs: indicates if there are more values in the database not retrieved in this query
 
   ShipmentResponse:
-    extends: Response
+    extends: commons.Response
     properties:
       data: Shipment
 

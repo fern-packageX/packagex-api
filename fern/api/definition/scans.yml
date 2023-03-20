@@ -69,7 +69,7 @@ types:
       created_at: 
         docs: Time in epoch seconds when this scan was created.
         type: integer
-      contact_matches: 
+      contact_matches: ContactMatches
       dimensions: optional<Dimensions>
       extracted_labels: 
       hash: 
@@ -147,10 +147,14 @@ types:
           tracking_number: "435466544243"
           type: shipping_label
 
+  ContactMatches: 
+    senders: list<Sender>
+    recipients: list<Recipient>
+  
   ScanResponse: 
     extends: commons.Response
-  properties: 
-    data: Scan
+    properties: 
+      data: Scan
   ScanType: 
     docs: Will default to "shipping_label".
     enum: 

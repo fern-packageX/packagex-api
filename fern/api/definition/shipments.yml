@@ -736,7 +736,7 @@ types:
         type: string
         docs: The developer code for the issue that occurred.
       data:
-        type: object
+        type: optional<map<string, unknown>>
         docs: The data object will be empty on errors
       errors:
         docs: An list of errors that occurred. Normally will be of the properties that failed validation.

@@ -84,3 +84,61 @@ types:
       - pharma
       - dry_ice
       - lithium
+  Inventory: 
+    docs: An inventory model is an item or asset that is inside of a manifest, fulfillment, or parcel.
+    properties:
+      attributes: optional<Attributes>
+      comment: 
+        docs: A free text field to add any comments about this item
+        type: optional<string>
+      created_at: 
+        docs: Time in epoch seconds when this resource was created
+        type: integer
+      verified_qty: 
+        docs: The amount of on hand inventory.
+        type: optional<integer>
+      damaged_qty: 
+        docs: The amount of on hand inventory that is deemed damaged
+        type: optional<integer>
+      manifested_qty: 
+        docs: The amount of inventory that is on a manifest that has not been added to inventory yet
+        type: optional<integer>
+      harmonized_code: 
+        docs: The harmonized system code for the item. This is required if you will be shipping this item internationally.
+        type: optional<string>
+      id: 
+        docs: The unique ID given to this product. This will stay the same even if the SKU or GTIN values are updated.
+        type: string
+      gtin: 
+        docs: The global identifier for the item, which is consistent across vendors for this item
+        type: optional<string>
+      serial_number: 
+        docs: A unique number given to an asset
+        type: string
+      image_url: 
+        docs: A thumbnail image for the inventory
+        type: string
+      name: 
+        docs: The name of the item
+        type: string
+      origin_country:
+        docs: The country that manufactured this item. This is required if shipping the item internationally
+        type: optional<string>
+      vendor: 
+        docs: The company that created the inventory
+        type: string
+      value: 
+        docs: The value of this each individual item in cents
+        type: optional<integer>
+      packaged_length: 
+        docs: The length of the item in inches when placed in shipping packaging
+        type: optional<double>
+      packaged_width: 
+        docs: The width of the item in inches when placed in shipping packaging
+        type: optional<double>
+      packaged_height: 
+        docs: The height of the item in inches when placed in shipping packaging
+        type: optional<double>
+      packaged_weight: 
+        docs: The weight of the item in pounds (lbs) when placed in shipping packaging
+        type: optional<double>

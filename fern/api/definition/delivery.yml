@@ -32,7 +32,8 @@ service:
 types: 
   DeliveryResponse: 
     extends: Response
-    data: Delivery
+    properties:
+      data: Delivery
   Delivery: 
     docs: The delivery represents a single tracking number with one or more parcels that needs to be delivered.
     properties:

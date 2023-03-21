@@ -91,7 +91,6 @@ service:
           pagination_offset:
             docs: If set, the result records would be offset-ed by this number.
             type: optional<integer>
-            required: false
           order_by: optional<OrderBy> 
     deleteMember: 
       docs: This endpoint deletes member(s) within access limits of the user role

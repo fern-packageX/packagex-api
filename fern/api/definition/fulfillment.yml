@@ -9,17 +9,17 @@ service:
       path: ""
       method: POST
       request: 
-        - name: CreateFulfillmentRequest
-          body: 
-            properties: 
-              recipient: commons.Recipient
-              location_id: 
-                docs: The ID of the location to which this manifest is being delivered
-                type: string
-              inventory: 
-                docs: The inventory that needs to be shipped in this fulfillment
-                type: list<commons.Inventory>
-          response: FulfillmentResponse
+        name: CreateFulfillmentRequest
+        body: 
+          properties: 
+            recipient: commons.Recipient
+            location_id: 
+              docs: The ID of the location to which this manifest is being delivered
+              type: string
+            inventory: 
+              docs: The inventory that needs to be shipped in this fulfillment
+              type: list<commons.Inventory>
+      response: FulfillmentResponse
       examples: 
         - request: 
             body: 

@@ -71,7 +71,7 @@ types:
         type: integer
       contact_matches: ContactMatches
       dimensions: optional<Dimensions>
-      extracted_labels: 
+      extracted_labels: ExtractedLabels
       hash: 
         docs: A unique hash for this scan that can be used to identify duplicate scans.
         type: string
@@ -146,11 +146,23 @@ types:
           service_level_name: Same Day
           tracking_number: "435466544243"
           type: shipping_label
+  ExtractedLabels:
+    docs: A list of all labels extracted from the document.
+    enum: 
+     - food
+     - legal_document
+     - pay_stub
+     - confidential
+     - fragile
+     - oversized
+     - time_sensitive
+     - return_to_sender
 
   ContactMatches: 
-    senders: list<Sender>
-    recipients: list<Recipient>
-  
+    properties: 
+      senders: list<Sender>
+      recipients: list<Recipient>
+    
   ScanResponse: 
     extends: commons.Response
     properties: 
@@ -162,7 +174,6 @@ types:
       - manifest
       - item 
       - invoice 
-    default: shipping_label 
   Dimensions: 
     properties: 
       length: 

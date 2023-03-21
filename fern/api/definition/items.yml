@@ -58,13 +58,13 @@ service:
         item: string
       method: POST
       request: 
-        - name: UpdateItemRequest
-          body: 
-            properties: 
-              name: 
-                docs: Updated name
-                type: optional<string> 
-              levels: optional<list<InventoryLevel>>
+        name: UpdateItemRequest
+        body: 
+          properties: 
+            name: 
+              docs: Updated name
+              type: optional<string> 
+            levels: optional<list<InventoryLevel>>
       response: ItemResponse
       examples: 
         - path-parameters:
@@ -108,7 +108,17 @@ service:
       path-parameters:
         item: string
       method: DELETE
-      response: {}
+      response: ItemResponse
+      examples:
+        - path-parameters: 
+            item: debebw3933hden
+          response:     
+            body: 
+              status: 200
+              data: {}
+              message: You deleted an item
+              errors: []
+              endpoint: /v1/item/{item}
 
             
 types:

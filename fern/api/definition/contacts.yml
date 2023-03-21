@@ -85,7 +85,7 @@ service:
             referenced_contacts: 
               docs: A list of all contacts referenced by this contact if it's a group with more details about them.
               type: optional<list<ReferencedContact>>
-              group_contacts: optional<GroupContacts>
+            group_contacts: optional<GroupContacts>
       response: ContactResponse
       examples: 
         - request: 
@@ -167,6 +167,7 @@ types:
       options: optional<commons.Options>
       organization_id:
         docs: Unique identifier for the organization that owns this delivery
+        type: optional<string>
       phone: 
         docs: The phone number for this contact.
         type: string
@@ -177,7 +178,7 @@ types:
       updated_at: 
         docs: Time in epoch seconds when this contact was last updated.
         type: integer
-      _search: optional<Search> 
+      search: optional<Search> 
     examples: 
       - name: Example1
         value: 

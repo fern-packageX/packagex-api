@@ -2,7 +2,7 @@ imports:
   commons: commons.yml
 service:
   auth: true
-  base-path: /v1/scans
+  base-path: /v1/locations
   endpoints: 
     create: 
       docs: Creates a location
@@ -37,11 +37,12 @@ service:
               name: PackageX HQ
               address: 500 7th Ave, Floor 10, New York, NY, 92110
           response: 
-            status: 200
-            data: $Location.Example1
-            message: You created a location
-            errors: []
-            endpoint: /
+            body: 
+              status: 200
+              data: $Location.Example1
+              message: You created a location
+              errors: []
+              endpoint: /v1/locations
 
     update: 
       docs: Updates a location
@@ -51,8 +52,8 @@ service:
       method: POST
       request: 
         name: UpdateLocationRequest
-        properties: 
-          body:
+        body: 
+          properties:
             name: 
               docs: The name given to this location.
               type: string
@@ -74,34 +75,36 @@ service:
       response: LocationResponse
       examples:
         - path-parameters:
-          shipment: loc_8GiCVuqZqBJi43v2WebaME
+            shipment: loc_8GiCVuqZqBJi43v2WebaME
           request:
             name: PackageX HQ
-            address: 500 7th Ave, Floor 10, New York, NY, 92110
-            kiosk_message: Please leave packages in the lobby
-            pickup_types: ["in_person_pickup", "curbside_pickup"]
-            metadata: {} 
-            access: Enter through the side door on 205 W 37th
-            operating_hours: 
-              saturday: 
-                active: true
-                open: "9:30"
-                close: "15:45"
-              sunday: 
-                active: false,
-            marketplace: 
-              active: false
-              fees: 
-                local_amount: 500 # $5.00
-                tax_percent: 7.25
-                toll_amount: 1550 # $15.50
-              capacity: 50,
+            body: 
+              address: 500 7th Ave, Floor 10, New York, NY, 92110
+              kiosk_message: Please leave packages in the lobby
+              pickup_types: ["in_person_pickup", "curbside_pickup"]
+              metadata: {} 
+              access: Enter through the side door on 205 W 37th
+              operating_hours: 
+                saturday: 
+                  active: true
+                  open: "9:30"
+                  close: "15:45"
+                sunday: 
+                  active: false,
+              marketplace: 
+                active: false
+                fees: 
+                  local_amount: 500 # $5.00
+                  tax_percent: 7.25
+                  toll_amount: 1550 # $15.50
+                capacity: 50
           response: 
-            status: 200
-            data: $Location.Example2
-            message: You updated a location
-            errors: []
-            endpoint: /loc_8GiCVuqZqBJi43v2WebaME
+            body:
+              status: 200
+              data: $Location.Example2
+              message: You updated a location
+              errors: []
+              endpoint:  /v1/locations/loc_8GiCVuqZqBJi43v2WebaME
           
     retrieve: 
       docs: Gets a location
@@ -125,8 +128,8 @@ service:
         location: string
       request: 
         name: AddUsersRequest
-        properties: 
-          body: 
+        body: 
+          properties: 
             users: 
               docs: Add many users at once by providing an array of user IDs
               type: list<string>
@@ -141,12 +144,13 @@ service:
             body: 
               users: ["2xFv1aJTgQTGGK6nWQeZ44P7hUR2", "hDfpP0P90gOuMgLOOCfdcvcyJiB3"]
               overwrite: true
-          response: 
-            status: 200
-            data: $Location.Example3
-            message: You added a list of users
-            errors: []
-            endpoint: /loc_8GiCVuqZqBJi43v2WebaME
+          response:
+            body:  
+              status: 200
+              data: $Location.Example3
+              message: You added a list of users
+              errors: []
+              endpoint:  /v1/locations/loc_8GiCVuqZqBJi43v2WebaME/users
 
     addOneUser: 
       path: /{location}/users/{user}
@@ -156,8 +160,8 @@ service:
         user: string
       request: 
         name: AddOneUserRequest
-        properties: 
-          body: 
+        body: 
+          properties: 
             overwrite: 
               docs: Add an overwrite property to ensure that any user not on this list will be deleted.
               type: optional<boolean> 
@@ -170,11 +174,12 @@ service:
             body: 
               overwrite: false
           response: 
-            status: 200
-            data: $Location.Example3
-            message: You added a user
-            errors: []
-            endpoint: /loc_8GiCVuqZqBJi43v2WebaME/2xFv1aJTgQTGGK6nWQeZ44P7hUR2
+            body: 
+              status: 200
+              data: $Location.Example3
+              message: You added a user
+              errors: []
+              endpoint:  /v1/locations/loc_8GiCVuqZqBJi43v2WebaME/2xFv1aJTgQTGGK6nWQeZ44P7hUR2/users/2xFv1aJTgQTGGK6nWQeZ44P7hUR2
 
     deleteUsers:
       path: /{location}/users
@@ -183,8 +188,8 @@ service:
         location: string
       request: 
         name: DeleteUsersRequest
-        properties: 
-          body: 
+        body: 
+          properties: 
             users: 
               docs: Delete many users at once by providing an array of user IDs
               type: list<string>
@@ -196,12 +201,13 @@ service:
             body: 
               users: ["2xFv1aJTgQTGGK6nWQeZ44P7hUR2", "hDfpP0P90gOuMgLOOCfdcvcyJiB3"]
               overwrite: true
-          response: 
-            status: 200
-            data: $Location.Example4
-            message: You deleted a list of users
-            errors: []
-            endpoint: /loc_8GiCVuqZqBJi43v2WebaM
+          response:
+            body:
+              status: 200
+              data: $Location.Example4
+              message: You deleted a list of users
+              errors: []
+              endpoint: /v1/locations/loc_8GiCVuqZqBJi43v2WebaM/users
 
     deleteOneUsers: 
       path: /{location}/users/{user}
@@ -214,12 +220,13 @@ service:
         - path-parameters: 
             location: loc_8GiCVuqZqBJi43v2WebaME
             user: 2xFv1aJTgQTGGK6nWQeZ44P7hUR2
-          response: 
-            status: 200
-            data: $Location.Example5
-            message: You deleted a user
-            errors: []
-            endpoint: /loc_8GiCVuqZqBJi43v2WebaME/2xFv1aJTgQTGGK6nWQeZ44P7hUR2
+          response:
+            body: 
+              status: 200
+              data: $Location.Example5
+              message: You deleted a user
+              errors: []
+              endpoint:  /v1/locations/loc_8GiCVuqZqBJi43v2WebaME/2xFv1aJTgQTGGK6nWQeZ44P7hUR2/users/2xFv1aJTgQTGGK6nWQeZ44P7hUR2
 
     createLayout: 
       path: /{location}/layouts
@@ -228,8 +235,8 @@ service:
         location: string
       request: 
         name: CreateParentLayoutRequest
-        properties: 
-          body: 
+        body: 
+          properties: 
             id: 
               docs: If you don't provide an id, one will be generated for you. 
               type: optional<string>
@@ -248,12 +255,13 @@ service:
               id: lay_aisle_1
               name: "Aisle 1"
               parent_path: "/"
-          response: 
-            status: 200
-            data: $Layout.Example1
-            message: You created a layout
-            errors: []
-            endpoint: /loc_8GiCVuqZqBJi43v2WebaME
+          response:
+            body: 
+              status: 200
+              data: $Layout.Example1
+              message: You created a layout
+              errors: []
+              endpoint:  /v1/locations/loc_8GiCVuqZqBJi43v2WebaME/layouts
 
     addShelves: 
       path: /{location}/layouts
@@ -262,8 +270,8 @@ service:
         location: string
       request: 
         name: AddShelvesRequest
-        properties: 
-          body: 
+        body: 
+          properties: 
             id: 
               docs: If you don't provide an id, one will be generated for you. 
               type: optional<string>
@@ -282,12 +290,13 @@ service:
               id: "lay_shelf_A"
               name: "Shelf A"
               parent_path: "/lay_aisle_1"
-          response: 
-            status: 200
-            data: $Layout.Example2
-            message: You added a shelf to Aisle 1
-            errors: []
-            endpoint: /loc_8GiCVuqZqBJi43v2WebaME
+          response:
+            body:  
+              status: 200
+              data: $Layout.Example2
+              message: You added a shelf to Aisle 1
+              errors: []
+              endpoint:  /v1/locations/loc_8GiCVuqZqBJi43v2WebaME/layouts
 
     addBins: 
       path: /{location}/layouts
@@ -296,8 +305,8 @@ service:
         location: string
       request: 
         name: AddBinsRequest
-        properties: 
-          body: 
+        body: 
+          properties: 
             id: 
               docs: If you don't provide an id, one will be generated for you. 
               type: optional<string>
@@ -316,12 +325,13 @@ service:
               id: "lay_binA"
               name: "Bin Alpha"
               parent_path: "/lay_aisle_1/lay_shelf_A"
-          response: 
-            status: 200
-            data: $Layout.Example3
-            message: You added a bin to shelf A
-            errors: []
-            endpoint: /loc_8GiCVuqZqBJi43v2WebaME
+          response:
+            body:  
+              status: 200
+              data: $Layout.Example3
+              message: You added a bin to shelf A
+              errors: []
+              endpoint:  /v1/locations/loc_8GiCVuqZqBJi43v2WebaME/layouts
 
     deleteLayout: 
       docs: When deleting layouts, you will just need to pass in the ID of the layouts you want to delete into the request body.
@@ -331,8 +341,8 @@ service:
         location: string
       request: 
         name: DeleteLayoutRequest
-        properties: 
-          body: 
+        body: 
+          properties: 
             layouts: 
               docs: Delete many layouts at once by providing an array of layout IDs
               type: list<string>
@@ -367,6 +377,12 @@ types:
     extends: commons.Response
     properties: 
       data: Location
+  ServiceAreas: 
+    docs: The postal code service areas that are served by this location. 
+    properties: 
+      postal_codes: 
+        docs: The postal codes for the U.S. market serviced by this location.
+        type: optional<list<string>>  
   Location: 
     docs: Locations are a common way to grant specific permissions for users and API Keys, act as a hub for shipments and delivery, and house the warehouse layouts where inventory is stored.
     properties: 
@@ -397,12 +413,7 @@ types:
       pickup_types: 
         docs: The types of pickups that are available at this location.
         type: optional<list<PickupType>>
-      service_areas: 
-        docs: The postal code service areas that are served by this location. 
-        properties: 
-          postal_codes: 
-            docs: The postal codes for the U.S. market serviced by this location.
-            type: optional<list<string>>  
+      service_areas: ServiceAreas
       terminal_location_id: 
         docs: The ID of any PackageX payment terminals that are added to this location.
         type: optional<string>
@@ -484,23 +495,24 @@ types:
       close: 
         docs: When this location closes in 24 hour format like - "17:00"
         type: string
+  Fees: 
+    properties: 
+      local_amount: 
+        docs: A fixed amount to add to a rat total for this location
+        type: integer
+      tax_percent: 
+        docs: The percent in taxes to add to the total for a shipping rate
+        type: double
+      toll_amount: 
+        docs: An amount to add to a shipping rate if the route crosses state or country lines
+        type: integer
   Marketplace:
     docs: If an organization is an approved provider on the PackageX shipping marketplace, these are location specific properties for that service area.
     properties: 
       active: 
         docs: If this location is active on the marketplace
         type: boolean
-      fees: 
-        properties: 
-          local_amount: 
-            docs: A fixed amount to add to a rat total for this location
-            type: integer
-          tax_percent: 
-            docs: The percent in taxes to add to the total for a shipping rate
-            type: double
-          toll_amount: 
-            docs: An amount to add to a shipping rate if the route crosses state or country lines
-            type: integer
+      fees: Fees
       capacity: 
         docs: The total daily capacity for deliveries at this location
         type: integer

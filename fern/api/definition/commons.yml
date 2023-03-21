@@ -1,7 +1,6 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
 
 types:
-  id: string
   Response:
     docs: An error response
     properties:
@@ -24,3 +23,56 @@ types:
       endpoint:
         docs: The endpoint that was hit
         type: string
+  Address:
+    docs: The PackageX address object
+    properties:
+      id:
+        docs: The ID for this address. Can be passed into any address field in the future to retrieve this exact address.
+        type: string
+      hash:
+        docs: Similar to the address ID, the hash is a unique string that identifies the address but without the line2 property.
+        type: string
+      line1:
+        docs: The first line of the street address.
+        type: string
+      line2:
+        docs: The second line of the street address.
+        type: string
+      city:
+        docs: The name of the city.
+        type: string
+      state:
+        docs: The full name of the state.
+        type: string
+      state_code:
+        docs: The abbreviated code for the state if applicable.
+        type: string
+      country:
+        docs: The full name of the country for this address.
+        type: string
+      country_code:
+        docs: The two character country code for this address.
+        type: string
+      postal_code:
+        docs: The postal code for this address.
+        type: string
+      formatted_address:
+        docs: The full text string of the address.
+        type: string
+      textarea:
+        docs: The full text string of the address without the line2 address. This is useful if using address auto complete that does not provide a line2 address which would be asked for in a separate input field.
+        type: string
+      timezone:
+        docs: The timezone for this address
+        type: string
+      verified:
+        docs: If we have verified this address
+        type: boolean
+  Options: 
+    properties: 
+      parse_addresses:
+        type: boolean
+        docs: If the extracted sender and recipient addresses should be run through the address parser.
+      match_contacts: 
+        type: boolean
+        docs: If you want the extracted sender and recipient fields to be matched to existing contacts in your organization.

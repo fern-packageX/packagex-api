@@ -1,0 +1,256 @@
+imports: 
+  commons: commons.yml
+service: 
+  auth: true
+  base-path: /v1/contacts
+  endpoints:
+    create: 
+      docs: This API will allow you to create a single contact using a traditional REST approach or many contacts at once using a csv or excel file encoded as a base64 data URL or public web URL.
+      path: ""
+      method: POST
+      request: 
+        name: CreateContactRequest
+        body: 
+          properties: 
+            name:  
+              docs: The name of the contact.
+              type: string
+            email: 
+              docs: The email for the contact.
+              type: optional<string>
+            phone: 
+              docs: The phone number for this contact.
+              type: optional<string>
+            type: optional<ContactType>
+            notes: 
+              docs: Any notes that were added about this contact.
+              type: optional<string>
+            address: optional<commons.Address>
+      response: ContactResponse
+      examples: 
+        - request: 
+            docs: The only required property for a creating a single contact is the name
+            body: 
+              name: Jamie Jones
+              type: person 
+          response: 
+            body:
+              status: 200
+              data: $Contact.Example1
+              message: You created a conact
+              errors: []
+              endpoint: /v1/contacts
+        - request: 
+            docs: A group will let you nest other contacts in the group. You'll need to add a name and update the type for the contact to "group." 
+            body: 
+              name: My Group
+              type: group
+          response:
+            body: 
+              status: 200
+              data: $Contact.Example2
+              message: You created a contact group
+              errors: []
+              endpoint: /v1/contacts
+    update: 
+      docs: To update a contact, you'll need to pass the contact's ID along with any properties that you want to manage.
+      path: /{contact}
+      path-parameters:
+        contact: string
+      method: POST
+      request: 
+        name: UpdateContactRequest
+        body: 
+          properties: 
+            name:  
+              docs: The name of the contact.
+              type: string
+            email: 
+              docs: The email for the contact.
+              type: optional<string>
+            phone: 
+              docs: The phone number for this contact.
+              type: optional<string>
+            type: optional<ContactType>
+            notes: 
+              docs: Any notes that were added about this contact.
+              type: optional<string>
+            address: optional<commons.Address>
+            metadata: 
+              docs: Key value pairs of data that you can set
+              type: optional<map<string, unknown>>
+            locations: 
+              docs: A list of location IDs to which this contact is associated.
+              type: optional<list<string>>
+            referenced_contacts: 
+              docs: A list of all contacts referenced by this contact if it's a group with more details about them.
+              type: optional<list<ReferencedContact>>
+              group_contacts: optional<GroupContacts>
+      response: ContactResponse
+      examples: 
+        - request: 
+            body: 
+              name: "Jamie Jones"
+              email: jamie@packagex.xyz
+              phone: "+11234567890"
+              address: "500 7th Ave, New York, NY 10018"
+              metadata: 
+                prop: "Whatever I want"
+              notes: "Will be out of town until Friday"
+          response: 
+            body:
+              status: 200
+              data: $Contact.Example3
+              message: You updated a single contact
+              errors: []
+              endpoint: /v1/contacts
+        - request: 
+            docs: To nest contacts in a group, add all of the IDs that you want to the children property.
+            body: 
+              name: "Finance Department"
+              type: "group"
+              group_contacts: 
+                - children: ["contact_rEMzyCyxJzuBzN4LyurAJV", "contact_kfxeR4ANbm9oC5RKztyc29"]
+                - primary: ["contact_kfxeR4ANbm9oC5RKztyc29"]
+          response:
+            body: 
+              status: 200
+              data: $Contact.Example4
+              message: You updated a contact group
+              errors: []
+              endpoint: /v1/contacts
+
+
+types: 
+  ContactResponse: 
+    extends: commons.Response
+    properties: 
+      data: Contact
+  Contact: 
+    properties: 
+      address: optional<commons.Address>
+      created_at: 
+        docs: Time in epoch seconds when this resource was created.
+        type: integer
+      email: 
+        docs: The email for the contact.
+        type: string
+      group_contacts: optional<GroupContacts>
+      id: 
+        docs: Unique identifier for the contact.
+        type: string
+      locations: 
+        docs: A list of location IDs to which this contact is associated.
+        type: optional<list<string>>
+      metadata: 
+        docs: Key value pairs of data that you can set
+        type: optional<map<string, unknown>>
+      name: 
+        docs: The name of the contact.
+        type: string
+      notes: 
+        docs: Any notes that were added about this contact.
+        type: optional<string>
+      options: optional<commons.Options>
+      organization_id:
+        docs: Unique identifier for the organization that owns this delivery
+      phone: 
+        docs: The phone number for this contact.
+        type: string
+      referenced_contacts: 
+        docs: A list of all contacts referenced by this contact if it's a group with more details about them.
+        type: optional<list<ReferencedContact>>
+      type: ContactType
+      updated_at: 
+        docs: Time in epoch seconds when this contact was last updated.
+        type: integer
+      _search: optional<Search> 
+    examples: 
+      - name: Example1
+        value: 
+          created_at: 1679591515
+          id: fewf3983hei32be9
+          name: Jamie Jones
+          type: person
+      - name: Example2
+        value: 
+          created_at: 1679591515
+          id: fwjfwjen33bjsd
+          name: My Group
+          type: group
+      - name: Example3
+        value: 
+          created_at: 1679591515
+          id: fewf3983hei32be9
+          name: Jamie Jones
+          type: person
+          email: jamie@packagex.xyz
+          phone: "+11234567890"
+          address: "500 7th Ave, New York, NY 10018"
+          metadata: 
+            prop: "Whatever I want"
+          notes: "Will be out of town until Friday"
+      - name: Example4
+        value: 
+          created_at: 1679591515
+          id: fwjfwjen33bjsd
+          name: "Finance Department"
+          type: group
+          group_contacts: 
+            - children: ["contact_rEMzyCyxJzuBzN4LyurAJV", "contact_kfxeR4ANbm9oC5RKztyc29"]
+            - primary: ["contact_kfxeR4ANbm9oC5RKztyc29"]
+
+  ContactType: 
+    docs: The type of contact.
+    enum: 
+      - person
+      - group 
+  GroupContacts: 
+    docs: Details about what contacts are nested inside of this contact. This is only possible if the contact type is set to group.
+    properties: 
+      children: 
+        docs: The IDs for the contacts that are children of this contact
+        type: list<string>
+      primary: 
+        docs: The IDs for the contacts that are the responsible party for all nested contacts
+        type: list<string>
+  ReferencedContact: 
+    properties:
+      id: 
+        docs: The ID of the referenced contact
+        type: string
+      name: 
+        docs: The name of the referenced contact
+        type: string
+      email: 
+        docs: The email of the referenced contact
+        type: string
+  Search: 
+    docs: A special property that will be included if searching through contacts.
+    properties: 
+      id: 
+        docs: The ID of the contact
+        type: string
+      type: 
+        docs: The type of contact.
+        type: string
+      name:
+        docs: The name of the contact
+        type: string
+      email: 
+        docs: The email of the contact
+        type: string
+      phone: 
+        docs: The phone number of the contact
+        type: string
+      formatted_address:  
+        docs: The contact's full address string.
+        type: string
+      metadata: 
+        docs: Any custom metadata that you have added
+        type: optional<map<string, unknown>>
+      relevance_score:
+        docs: A number from 0 - 1 about how relevant the result was to the search query, with 1 being a perfect match.
+        type: double
+
+        

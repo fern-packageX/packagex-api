@@ -119,6 +119,19 @@ service:
               message: You updated a contact group
               errors: []
               endpoint: /v1/contacts
+    retrieve: 
+      docs: Gets a single contact
+      path: /{contact}
+      path-parameters:
+        contact: string
+      method: GET
+      response: ContactResponse
+
+    list: 
+      docs: Gets all contacts
+      path: ""
+      method: GET
+      response: ContactResponse
 
 
 types: 

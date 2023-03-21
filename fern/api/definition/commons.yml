@@ -76,3 +76,11 @@ types:
       match_contacts: 
         type: boolean
         docs: If you want the extracted sender and recipient fields to be matched to existing contacts in your organization.
+  Attributes:
+    docs: Indicates certain aspects of the item that will impact shipping and handling
+    enum:
+      - alcohol
+      - marijuana
+      - pharma
+      - dry_ice
+      - lithium

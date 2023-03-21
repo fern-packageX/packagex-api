@@ -1,0 +1,343 @@
+imports: 
+  commons: commons.yml
+service:
+  auth: true
+  base-path: /v1/fulfillment
+  endpoints:
+    create: 
+      docs: Add the required inventory that needs to be shipped to the desired recipient from your specified location.
+      path: ""
+      method: POST
+      request: 
+        - name: CreateFulfillmentRequest
+          body: 
+            properties: 
+              recipient: commons.Recipient
+              location_id: 
+                docs: The ID of the location to which this manifest is being delivered
+                type: string
+              inventory: 
+                docs: The inventory that needs to be shipped in this fulfillment
+                type: list<commons.Inventory>
+          response: FulfillmentResponse
+      examples: 
+        - request: 
+            body: 
+              location_id: "loc_afnHMjVUn3gnrvxU5zMvkX"
+              recipient: 
+                name: "Jamie Jones"
+                email: "jamie@packagex.xyz"
+                phone: "4844836699"
+                address: "500 7th Ave, New York, NY 10018"
+              inventory: 
+                # If the inventory item is all set up, just the ID and quantity you want to send is required
+                  - id: "item_5og9NZ92SYzHKFTPYSEnVK"
+                    verified_qty: 25
+                # If the item was created but does not have the packaged_* dimensions, they can be entered inline
+                  - id: "item_1nCNpqtyepe48BMNhzmW54"
+                    verified_qty: 50
+                    packaged_length: 2
+                    packaged_width: 3
+                    packaged_height: 4
+                    packaged_weight: 6
+                # If an item is not in our inventory system, it can be added without providing an ID. Ideally a SKU or GTIN is added for barcode scanning by the users.
+                # A special, temporary ID will be generated for it with the prefix temp_ to make working with the data easier
+                  - name: "Custom Item"
+                    verified_qty: 5
+                    packaged_length: 2
+                    packaged_width: 3
+                    packaged_height: 4
+                    packaged_weight: 6
+                    sku: "237489237489"
+                    image_url: "https://i.imgur.com/FKmX7dt.gif"
+          response: 
+            body:
+              status: 200
+              data: $Fulfillment.Example1
+              message: You created a fulfillment
+              errors: []
+              endpoint: /v1/fulfillment
+    createParcel: 
+      docs: Add the box or boxes into which you're going to pack the inventory items.
+      path: /{fulfillment}/parcels
+      path-parameters:
+        fulfillment: string
+      method: POST
+      request: 
+        body:
+          properties:
+            parcel: commons.Parcel
+      response: FulfillmentResponse
+      examples:
+        - path-parameters:
+            fulfillment: ful_dwdh3239ubcejbcjd
+          request: 
+            body:
+             parcels:  
+              - length: 10
+                width: 10
+                height: 10
+          response: 
+            body: 
+              status: 200
+              data: $Fulfillment.Example2
+              message: You created a parcel 
+              errors: []
+              endpoint: /v1/fulfillment/{fulfillment}/parcels
+            
+    packParcel:
+      docs: Pack the items into the parcel(s) that you have added.
+      path: /{fulfillment}/parcels/{parcel}
+      method: POST
+      path-parameters:
+        fulfillment: string
+        parcel: string
+      request: 
+        body: 
+          properties: 
+            inventory: list<commons.Inventory>
+      response: FulfillmentResponse
+      examples:
+        - path-parameters:
+            fulfillment: ful_dwdh3239ubcejbcjd
+            parcel: prcl_fnweifnief9292
+          request: 
+            body: 
+              inventory: 
+                - id: "item_1nCNpqtyepe48BMNhzmW54"
+                  verified_qty: 2
+                - id: "temp_5og9NZ92SYzHKFTPYSEnVK"
+                  verified_qty: 2
+                  damaged_qty: 5
+          response: 
+            body: 
+              status: 200
+              data: $Fulfillment.Example3
+              message: You packed a parcel 
+              errors: []
+              endpoint: /v1/fulfillment/{fulfillment}/parcels/{parcel}
+    deleteParcel: 
+      docs: If you decide to delete the parcel from the fulfillment, any inventory attributed to that parcel will be removed and reset.
+      path: /{fulfillment}/parcels/{parcel}
+      method: POST
+      path-parameters:
+        fulfillment: string
+        parcel: string
+      response: FulfillmentResponse
+      examples:
+        - path-parameters:
+            fulfillment: ful_dwdh3239ubcejbcjd
+            parcel: prcl_fnweifnief9292
+          response: 
+            body: 
+              status: 200
+              data: {}
+              message: You deleted a parcel 
+              errors: []
+              endpoint: /v1/fulfillment/{fulfillment}/parcels/{parcel}
+    update: 
+      docs: Mark the fulfillment as packed.
+      path: /{fulfillment}
+      path-parameters:
+        fulfillment: string
+      method: POST
+      request: 
+        body: 
+          properties: 
+            status: FulfillmentStatus
+      response: FulfillmentResponse
+      examples:
+        - path-parameters:
+            fulfillment: ful_dwdh3239ubcejbcjd
+          request: 
+            body:
+              status: "packed"
+          response: 
+            body: 
+              status: 200
+              data: $Fulfillment.Example3
+              message: You marked fulfillment as packed
+              errors: []
+              endpoint: /v1/fulfillment/{fulfillment}
+
+
+
+types: 
+  FulfillmentResponse: 
+    extends: commons.Response
+    properties: 
+      data: Fulfillment
+  Fulfillment:
+    docs: The fulfillment model represents a unique fulfillment containing the inventory that was sent to the recipient.
+    properties: 
+      cancel_reason:
+        docs: If the fulfillment gets canceled, a reason can be optionally provided here.
+        type: optional<string>
+      created_at: 
+        docs: Time in epoch seconds when this resource was created
+        type: integer
+      complete_by: 
+        docs: Time in epoch seconds by which this fulfillment should be completed
+        type: integer
+      id: 
+        docs: The unique ID given to this fulfillment prefixed with ful_
+        type: string
+      inventory: 
+        docs: The inventory that needs to be shipped in this fulfillment
+        type: list<commons.Inventory>
+      label_url: 
+        docs: The URL of the shipping label that gets generated when the fulfillment is completed
+        type: string
+      location_id: 
+        docs: The ID of the location to which this manifest is being delivered
+        type: string
+      metadata:
+        docs: These are your metadata key value pairs added to the manifest
+        type: optional<map<string, unknown>>
+      order_number: 
+        docs: The order number that either you provided to the fulfillment or that PackageX added automatically
+        type: string
+      organization_id: 
+        docs: The ID of the organization that owns this fulfillment. In almost all cases, this will be your organization ID.
+        type: string
+      packaging_recommendations: 
+        docs: A list of the recommended way(s) to package to product into parcels if any shipping boxes are predefined in the settings. This is currently an empty array for all users.
+        type: list
+      packing_slip_url: 
+        docs: The URL to the PDF of the packing slip for all items added to inventory
+        type: list
+      parcels: 
+        docs: All parcels in the fulfillment and the inventory packed within them
+        type: list<Parcel>
+      rates_generated_at: 
+        docs: Time in epoch seconds when shipping rates were generated for this fulfillment. Shipping rates are only valid for 15 minutes after which new rates must be fetched.
+        type: integer
+      recipient: 
+        docs: Details about the contact receiving this shipment
+        type: commons.Recipient
+      sender: 
+        docs: Details about the contact sending this shipment
+        type: commons.Sender
+      shipment_id: 
+        docs: The ID of the shipment associated with this fulfillment, prefixed with ship_
+        type: string
+      shipment_rate_type: ShipmentRateType 
+      status: FulfillmentStatus
+      updated_at: 
+        docs: Time in epoch seconds when this resource was last updated
+        type: integer
+    examples:
+      - name: Example1
+        value: 
+          id: ful_dwdh3239ubcejbcjd
+          created_at: 1679591515
+          location_id: "loc_afnHMjVUn3gnrvxU5zMvkX"
+          recipient: 
+            name: "Jamie Jones"
+            email: "jamie@packagex.xyz"
+            phone: "4844836699"
+            address: "500 7th Ave, New York, NY 10018"
+          inventory: 
+              - id: "item_5og9NZ92SYzHKFTPYSEnVK"
+                verified_qty: 25
+              - id: "item_1nCNpqtyepe48BMNhzmW54"
+                verified_qty: 50
+                packaged_length: 2
+                packaged_width: 3
+                packaged_height: 4
+                packaged_weight: 6
+              - name: "Custom Item"
+                verified_qty: 5
+                packaged_length: 2
+                packaged_width: 3
+                packaged_height: 4
+                packaged_weight: 6
+                sku: "237489237489"
+                image_url: "https://i.imgur.com/FKmX7dt.gif"
+      - name: Example2
+        value: 
+          id: ful_dwdh3239ubcejbcjd
+          created_at: 1679591515
+          location_id: "loc_afnHMjVUn3gnrvxU5zMvkX"
+          parcels: 
+            - id: prcl_fnweifnief9292
+              length: 10
+              width: 10
+              height: 10
+          recipient: 
+            name: "Jamie Jones"
+            email: "jamie@packagex.xyz"
+            phone: "4844836699"
+            address: "500 7th Ave, New York, NY 10018"
+          inventory: 
+              - id: "item_5og9NZ92SYzHKFTPYSEnVK"
+                verified_qty: 25
+              - id: "item_1nCNpqtyepe48BMNhzmW54"
+                verified_qty: 50
+                packaged_length: 2
+                packaged_width: 3
+                packaged_height: 4
+                packaged_weight: 6
+              - name: "Custom Item"
+                verified_qty: 5
+                packaged_length: 2
+                packaged_width: 3
+                packaged_height: 4
+                packaged_weight: 6
+                sku: "237489237489"
+                image_url: "https://i.imgur.com/FKmX7dt.gif"
+      - name: Example3
+        value: 
+          id: ful_dwdh3239ubcejbcjd
+          status: packed
+          created_at: 1679591515
+          location_id: "loc_afnHMjVUn3gnrvxU5zMvkX"
+          parcels: 
+            - id: prcl_fnweifnief9292
+              length: 10
+              width: 10
+              height: 10
+              inventory: 
+                - id: "item_1nCNpqtyepe48BMNhzmW54"
+                  verified_qty: 2
+                - id: "temp_5og9NZ92SYzHKFTPYSEnVK"
+                  verified_qty: 2
+                  damaged_qty: 5
+          recipient: 
+            name: "Jamie Jones"
+            email: "jamie@packagex.xyz"
+            phone: "4844836699"
+            address: "500 7th Ave, New York, NY 10018"
+          inventory: 
+              - id: "item_5og9NZ92SYzHKFTPYSEnVK"
+                verified_qty: 25
+              - id: "item_1nCNpqtyepe48BMNhzmW54"
+                verified_qty: 50
+                packaged_length: 2
+                packaged_width: 3
+                packaged_height: 4
+                packaged_weight: 6
+              - name: "Custom Item"
+                verified_qty: 5
+                packaged_length: 2
+                packaged_width: 3
+                packaged_height: 4
+                packaged_weight: 6
+                sku: "237489237489"
+                image_url: "https://i.imgur.com/FKmX7dt.gif"
+  FulfillmentStatus: 
+    docs: The status of the fulfillment
+    enum: 
+      - created
+      - processing
+      - packed
+      - completed
+      - canceled
+  ShipmentRateType: 
+    docs: The type of rate that was purchased for the shipment linked to the fulfillment without needing to query the shipment.
+    enum: 
+      - in_person_pickup
+      - curbside_pickup
+      - locker_pickup
+      - provider_delivery
+      - offline_delivery 

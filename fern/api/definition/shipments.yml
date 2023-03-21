@@ -346,6 +346,9 @@ types:
       label_url:
         docs: The shipping label PDF for this parcel if a shipment was purchased
         type: optional<string>
+      inventory: 
+        docs: The inventory packed inside of the parcel
+        type: commons.Inventory
     examples:
       - name: Example1
         value:

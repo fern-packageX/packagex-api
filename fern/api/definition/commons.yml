@@ -19,11 +19,18 @@ types:
       pagination: optional<Pagination>
       events:
         docs: All of the events that were triggered due to this request
-        type: list<string>
+        type: optional<list<string>>
       endpoint:
         docs: The endpoint that was hit
         type: string
+
   Address:
+    discriminated: false
+    union:
+      - string
+      - ParsedAddress
+
+  ParsedAddress:
     docs: The PackageX address object
     properties:
       id:
@@ -68,14 +75,49 @@ types:
       verified:
         docs: If we have verified this address
         type: boolean
-  Options: 
-    properties: 
+    examples:
+      - name: Example1
+        value:
+          id: defnewfed_93392
+          hash: dac0efe_w9dw
+          line1: 500 7th Ave
+          line2: Fl 10
+          city: New York
+          state: New York
+          state_code: NY
+          country: United States
+          country_code: US
+          postal_code: "10018"
+          formatted_address: 500 7th Ave, Fl 10, New York, NY, 10018
+          textarea: 500 7th Ave
+          timezone: EST
+          verified: true
+      - name: Example2
+        value:
+          id: fefewfe_9292
+          hash: efneif_2921
+          line1: 600 B. Street
+          line2: Suite 300
+          city: San Diego
+          state: California
+          state_code: CA
+          country: United States
+          country_code: US
+          postal_code: "90101"
+          formatted_address: 600 B. Street, Suite 300 7th Ave, Fl 10, San Diego, California 90101
+          textarea: 600 B. Street
+          timezone: PST
+          verified: true
+
+  Options:
+    properties:
       parse_addresses:
         type: boolean
         docs: If the extracted sender and recipient addresses should be run through the address parser.
-      match_contacts: 
+      match_contacts:
         type: boolean
         docs: If you want the extracted sender and recipient fields to be matched to existing contacts in your organization.
+
   Attributes:
     docs: Indicates certain aspects of the item that will impact shipping and handling
     enum:
@@ -84,61 +126,350 @@ types:
       - pharma
       - dry_ice
       - lithium
-  Inventory: 
+
+  Inventory:
     docs: An inventory model is an item or asset that is inside of a manifest, fulfillment, or parcel.
     properties:
       attributes: optional<Attributes>
-      comment: 
+      comment:
         docs: A free text field to add any comments about this item
         type: optional<string>
-      created_at: 
+      created_at:
         docs: Time in epoch seconds when this resource was created
-        type: integer
-      verified_qty: 
+        type: optional<integer>
+      verified_qty:
         docs: The amount of on hand inventory.
         type: optional<integer>
-      damaged_qty: 
+      damaged_qty:
         docs: The amount of on hand inventory that is deemed damaged
         type: optional<integer>
-      manifested_qty: 
+      manifested_qty:
         docs: The amount of inventory that is on a manifest that has not been added to inventory yet
         type: optional<integer>
-      harmonized_code: 
+      harmonized_code:
         docs: The harmonized system code for the item. This is required if you will be shipping this item internationally.
         type: optional<string>
-      id: 
+      id:
         docs: The unique ID given to this product. This will stay the same even if the SKU or GTIN values are updated.
-        type: string
-      gtin: 
+        type: optional<string>
+      gtin:
         docs: The global identifier for the item, which is consistent across vendors for this item
         type: optional<string>
-      serial_number: 
+      sku:
+        docs: The unique identifier that is added by you for this item
+        type: optional<string>
+      serial_number:
         docs: A unique number given to an asset
-        type: string
-      image_url: 
+        type: optional<string>
+      image_url:
         docs: A thumbnail image for the inventory
-        type: string
-      name: 
+        type: optional<string>
+      name:
         docs: The name of the item
-        type: string
+        type: optional<string>
       origin_country:
         docs: The country that manufactured this item. This is required if shipping the item internationally
         type: optional<string>
-      vendor: 
+      vendor:
         docs: The company that created the inventory
-        type: string
-      value: 
+        type: optional<string>
+      value:
         docs: The value of this each individual item in cents
         type: optional<integer>
-      packaged_length: 
+      packaged_length:
         docs: The length of the item in inches when placed in shipping packaging
         type: optional<double>
-      packaged_width: 
+      packaged_width:
         docs: The width of the item in inches when placed in shipping packaging
         type: optional<double>
-      packaged_height: 
+      packaged_height:
         docs: The height of the item in inches when placed in shipping packaging
         type: optional<double>
-      packaged_weight: 
+      packaged_weight:
         docs: The weight of the item in pounds (lbs) when placed in shipping packaging
         type: optional<double>
+
+  Sender:
+    docs: The information about the shipment sender, which is normally the organization using this API
+    properties:
+      address: Address
+      name:
+        docs: The sender's name
+        type: string
+      email:
+        docs: The sender's email
+        type: string
+      phone:
+        docs: The sender's phone
+        type: string
+      contact_id:
+        docs: The sender's unique packagex ID
+        type: string
+    examples:
+      - name: Example1
+        value:
+          name: Jamie Jones
+          email: jamie@packagex.io
+          phone: "4844836699"
+          contact_id: cwnwif2821
+          address: $ParsedAddress.Example1
+
+  Parcel:
+    docs: A parcel or package that will be included in a shipment
+    properties:
+      attributes: optional<list<Attributes>>
+      id:
+        docs: The unique ID assigned to the parcel beginning with prcl_
+        type: string
+      length:
+        docs: The length of the package in inches
+        type: integer
+      width:
+        docs: The width of the package in inches
+        type: integer
+      height:
+        docs: The height of the package in inches
+        type: integer
+      weight:
+        docs: The weight of the package in pounds
+        type: optional<integer>
+      type: optional<PackageType>
+      special_handling:
+        docs: Any special handing instructions provided. Not all shipping providers support these
+        type: optional<string>
+      tracking_number:
+        docs: The tracking number for this parcel if a shipment was purchased
+        type: optional<string>
+      label_url:
+        docs: The shipping label PDF for this parcel if a shipment was purchased
+        type: optional<string>
+      inventory:
+        docs: The inventory packed inside of the parcel
+        type: optional<Inventory>
+    examples:
+      - name: Example1
+        value:
+          id: ebfweufe922828
+          length: 2
+          width: 5
+          height: 4
+          weight: 1
+          type: usps_flat_rate_envelope
+
+  Recipient:
+    docs: The information about the shipment recipient
+    properties:
+      address: Address
+      name:
+        docs: The recipient's name
+        type: string
+      email:
+        docs: The recipient's email
+        type: string
+      phone:
+        docs: The recipient's phone
+        type: string
+      contact_id:
+        docs: The ID of the contact if one was used to create this recipient.
+        type: string
+    examples:
+      - name: Example1
+        value:
+          name: Odin Oliver
+          email: odin.oliver@packagex.io
+          phone: "4844836699"
+          contact_id: fwefwv28281
+          address: $ParsedAddress.Example2
+
+  TrackingUpdate:
+    docs: The record of each tracking update from a shipment
+    properties:
+      address: Address
+      status: ShipmentStatus
+      comment:
+        docs: A shipping provider comment
+        type: optional<string>
+      images:
+        docs: Urls of images
+        type: list<string>
+      message:
+        docs: Human readable text explaining the status
+        type: string
+      event:
+        docs: The event that occurred when this event was created. For all events see https://docs.packagex.io/shipments/events
+        type: string
+      created_at:
+        docs: Time from unix eopch seconds when this tracking update was created
+        type: integer
+      updated_at:
+        docs: The time in epoch seconds when this status was last updated
+        type: integer
+      location_id:
+        docs: The ID of the location of this update, if it is one of your locations.
+        type: optional<string>
+      layout_id:
+        docs: The ID of the layout that this item is on, if it matches one of your locations.
+        type: optional<string>
+    examples:
+      - name: Example1
+        value:
+          address: $ParsedAddress.Example1
+          status: in_transit
+          message: In Transit
+          images: []
+          created_at: 1679591515
+          updated_at: 1679591623
+          event: Your package is in transit
+      - name: Example2
+        value:
+          address: $ParsedAddress.Example1
+          status: out_for_delivery
+          message: Out for Delivery
+          images: []
+          created_at: 1679591515
+          updated_at: 1679591623
+          event: Your package is out for delivery
+
+  Search:
+    docs: A special property that will be included if searching through shipments.
+    properties:
+      id:
+        docs: The ID of the shipment.
+        type: string
+      tracking_number:
+        docs: The tracking number.
+        type: string
+      sender_name:
+        docs: The sender's name. It will also match common nicknames.
+        type: string
+      sender_email:
+        docs: The sender's email.
+        type: string
+      sender_phone:
+        docs: The sender's phone.
+        type: string
+      sender_formatted_address:
+        docs: The sender's full address string.
+        type: string
+      recipient_name:
+        docs: The recipient's name. It will also match common nicknames.
+        type: string
+      recipient_email:
+        docs: The recipient's email.
+        type: string
+      recipient_phone:
+        docs: The recipient's phone.
+        type: string
+      recipient_formatted_address:
+        docs: The recipient's full address string.
+        type: string
+      provider_name:
+        docs: The shipping provider's name.
+        type: string
+      provider_id:
+        docs: The shipping provider's ID
+        type: string
+      metadata:
+        docs: Any custom metadata that you have added
+        type: optional<map<string, unknown>>
+      relevance_score:
+        docs: A number from 0 - 1 about how relevant the result was to the search query, with 1 being a perfect match.
+        type: double
+
+  Filters:
+    docs: A sudo status given to the delivery to know what is happening with the delivery.
+    enum:
+      - completed
+      - outstanding
+      - exception
+
+  Pagination:
+    docs: The pagination object returned in responses where multiple values are returned
+    properties:
+      limit:
+        type: integer
+        docs: The limit for the responses
+      page:
+        type: integer
+        docs: The current page offset that is being retrieved
+      has_more:
+        type: boolean
+        docs: indicates if there are more values in the database not retrieved in this query
+
+  PackageType:
+    docs: The courier specific packaging. See https://docs.packagex.io/shipments/predefined-packages for more information
+    enum:
+      - usps_flat_rate_envelope
+      - usps_flat_rate_window_envelope
+      - usps_small_flat_rate_envelope
+      - usps_flat_rate_padded_envelope
+      - usps_flat_rate_legal_envelope
+      - usps_small_flat_rate_box
+      - usps_medium_flat_rate_box_1
+      - usps_medium_flat_rate_box_2
+      - usps_large_flat_rate_box_1
+      - usps_large_flat_rate_box_2
+      - usps_large_flat_rate_box_apo_fpo
+
+  ShipmentStatus:
+    docs: The current status for the shipment. It's the same status as the latest tracking_update just surfaced for convenience. See https://docs.packagex.io/shipments/statuses for more info on statuses.
+    enum:
+      - rates_generated
+      - created
+      - address_issue
+      - provider_at_pickup
+      - contact_provider
+      - delayed
+      - delivery_attempted
+      - delivery_rescheduled
+      - delivery_scheduled
+      - out_for_delivery
+      - package_accepted
+      - package_at_waypoint
+      - in_transit
+      - pickup_available
+      - provider_at_dropoff
+      - package_damaged
+      - delivered
+      - return_to_sender
+      - package_undeliverable
+      - package_lost
+      - canceled
+
+  Provider:
+    docs: Details about a shipping provider for a given rate or shipment
+    properties:
+      name:
+        docs: The name of the provider
+        type: string
+      id:
+        docs: Unique ID of the provider
+        type: string
+      logo_url:
+        docs: The url for the provider's logo
+        type: string
+      support_email:
+        docs: The contact email provided by the shipping provider
+        type: optional<string>
+      support_phone:
+        docs: The contact phone provided by the shipping provider
+        type: optional<string>
+      support_url:
+        docs: The contact website provided by the shipping provider
+        type: string
+      support_reference:
+        docs: A support reference code that some providers use to help customers.
+        type: optional<string>
+      marketplace:
+        docs: If this shipping provider came from the PackageX marketplace. Typically large providers like FedEx, UPS, USPS, etc are not from the marketplace and same-day courier are not.
+        type: boolean
+    examples:
+      - name: Example1
+        value:
+          name: UPS
+          id: 2dij3dn9
+          logo_url: "NA"
+          support_email: support@ups.com
+          support_phone: 1-800-742-5877
+          support_url: https://www.ups.com/us/en/support/contact-us.page
+          marketplace: false

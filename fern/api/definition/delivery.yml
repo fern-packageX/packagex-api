@@ -1,10 +1,13 @@
-imports: 
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
   commons: commons.yml
-service: 
+
+service:
   auth: true
   base-path: /v1/delivery
   endpoints:
-    retrieve: 
+    retrieve:
       docs: Gets a single delivery
       path: /{delivery}
       path-parameters:
@@ -12,32 +15,32 @@ service:
       method: GET
       response: DeliveryResponse
 
-    list: 
+    list:
       docs: Gets all deliveries
       path: ""
       method: GET
       response: DeliveryResponse
-    
-    update: 
-      docs: You can update the status of the delivery which will typically send notifications to the sender and recipient, depending on what notifications they have enabled. You can also update the coordinates of the delivery without updating the status for a better user experience.
-      path: /{delivery}
-      path-parameters:
-        delivery: string
-      request: 
-        body: 
-          properties: 
-            tracking_update: optional<commons.TrackingUpdate>
-            location: ## 
+    # update:
+    #   docs: You can update the status of the delivery which will typically send notifications to the sender and recipient, depending on what notifications they have enabled. You can also update the coordinates of the delivery without updating the status for a better user experience.
+    #   path: /{delivery}
+    #   path-parameters:
+    #     delivery: string
+    #   request:
+    #     body:
+    #       properties:
+    #         tracking_update: optional<commons.TrackingUpdate>
+    #         location: ##
 
-types: 
-  DeliveryResponse: 
-    extends: Response
+types:
+  DeliveryResponse:
+    extends: commons.Response
     properties:
       data: Delivery
-  Delivery: 
+
+  Delivery:
     docs: The delivery represents a single tracking number with one or more parcels that needs to be delivered.
     properties:
-      coordinates: 
+      coordinates:
         docs: The latitude and longitude of the current location
         type: list<double> ## not actually sure if this is the right way to model Array<Number, Number>
       created_at:
@@ -89,4 +92,3 @@ types:
         docs: A list of all tracking updates that occurred for this shipment from oldest to newest
         type: list<commons.TrackingUpdate>
       _search: optional<commons.Search>
-

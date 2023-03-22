@@ -1,47 +1,48 @@
-imports: 
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
   commons: commons.yml
-service: 
+
+service:
   auth: true
   base-path: /v1/manifest
   endpoints:
-    create: 
+    create:
       docs: To create a manifest, you only need to include the location_id and specify the inventory items that you want to add.
       path: ""
       method: POST
-      request: 
+      request:
         name: CreateManifestRequest
-        body: 
-          properties: 
-            location_id: 
+        body:
+          properties:
+            location_id:
               docs: The ID of the location to which this manifest is being delivered
               type: string
-            inventory: 
+            inventory:
               docs: The inventory that is included in the manifest
-              type: list<commons.Inventory> 
+              type: list<commons.Inventory>
       response: ManifestResponse
-      examples: 
-        - request: 
-            body:
-              location_id: "loc_afnHMjVUn3gnrvxU5zMvkX" 
-              inventory: 
-                - id: "item_pu8iNbturZy5zvB4zaUZ8t" # Create by ID
-                  manifested_qty: 50
-                - sku: "DRC123" # Create by SKU. If SKU doesn't exist we'll create one
-                  manifested_qty: 50
-                - gtin: "123456789" # Create by GTIN.
-                  manifested_qty: 50
-          response: 
+      examples:
+        - request:
+            location_id: "loc_afnHMjVUn3gnrvxU5zMvkX"
+            inventory:
+              - id: "item_pu8iNbturZy5zvB4zaUZ8t" # Create by ID
+                manifested_qty: 50
+              - sku: "DRC123" # Create by SKU. If SKU doesn't exist we'll create one
+                manifested_qty: 50
+              - gtin: "123456789" # Create by GTIN.
+                manifested_qty: 50
+          response:
             body:
               status: 200
               data: $Manifest.Example1
               message: You created a manifest
               errors: []
               endpoint: /v1/manifest
-              
-    update:
-      docs: Before you can update a manifest, you'll need to update its status to accepted.
-    
-    retrieve: 
+    # update:
+    #   docs: Before you can update a manifest, you'll need to update its status to accepted.
+
+    retrieve:
       docs: Gets a single manifest
       path: /{manifest}
       path-parameters:
@@ -49,61 +50,62 @@ service:
       method: GET
       response: ManifestResponse
 
-    list: 
+    list:
       docs: Gets all manifests
       path: ""
       method: GET
       response: ManifestResponse
-      
-types: 
-  ManifestResponse: 
+
+types:
+  ManifestResponse:
     extends: commons.Response
-    properties: 
+    properties:
       data: Manifest
-  Manifest: 
+
+  Manifest:
     docs: The manifest model represents a unique manifest containing the inventory that you would like to track.
     properties:
-      created_at: 
+      created_at:
         docs: Time in epoch seconds when this resource was created
         type: integer
-      created_inventory: 
+      created_inventory:
         docs: Inventory must be created before the manifest can be acted upon. It is common for this to be empty.
-        type: list<commons.Inventory>
+        type: optional<list<commons.Inventory>>
       estimated_delivery:
         docs: Time in epoch seconds when we estimate the delivery will occur.
         type: optional<integer>
-      id: 
+      id:
         docs: The unique ID given to this manifest prefixed with msft_
         type: string
-      inventory: 
+      inventory:
         docs: The inventory that is included in the manifest
-        type: list<commons.Inventory> 
-      location_id: 
+        type: list<commons.Inventory>
+      location_id:
         docs: The ID of the location to which this manifest is being delivered
         type: string
       metadata:
         docs: These are your metadata key value pairs added to the manifest
         type: optional<map<string, unknown>>
-      order_number: 
+      order_number:
         docs: The order number that either you provided to the manifest or that PackageX added automatically
-        type: string
-      organization_id: 
+        type: optional<string>
+      organization_id:
         docs: The ID of the organization that owns this manifest. In almost all cases, this will be your organization ID.
-        type: string
-      tracking_numbers: 
+        type: optional<string>
+      tracking_numbers:
         docs: A list of all tracking numbers for this manifest. When added, trackers will be created for each tracking number which will then update the estimated_delivery property.
-        type: list<string> 
-      status: ManifestStatus
-      updated_at: 
+        type: optional<list<string>>
+      status: optional<ManifestStatus>
+      updated_at:
         docs: Time in epoch seconds when this item was last updated
-        type: integer
+        type: optional<integer>
     examples:
       - name: Example1
-        value: 
-          created_at: 
+        value:
+          created_at: 1679591515
           id: deuibcud2fwefwec33
-          location_id: "loc_afnHMjVUn3gnrvxU5zMvkX" 
-          inventory: 
+          location_id: "loc_afnHMjVUn3gnrvxU5zMvkX"
+          inventory:
             - id: "item_pu8iNbturZy5zvB4zaUZ8t" # Create by ID
               manifested_qty: 50
             - sku: "DRC123" # Create by SKU. If SKU doesn't exist we'll create one
@@ -111,11 +113,11 @@ types:
             - gtin: "123456789" # Create by GTIN.
               manifested_qty: 50
 
-  ManifestStatus: 
+  ManifestStatus:
     docs: The status of the manifest
-    enum: 
-     - requested
-     - accepted
-     - processing
-     - completed
-     - void
+    enum:
+      - requested
+      - accepted
+      - processing
+      - completed
+      - void

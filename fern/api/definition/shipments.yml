@@ -1,6 +1,8 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
-imports: 
+
+imports:
   commons: commons.yml
+
 service:
   auth: true
   base-path: /v1/shipments
@@ -13,15 +15,15 @@ service:
         name: CreateShipmentRequest
         body:
           properties:
-            sender: Sender
-            recipient: Recipient
-            parcel: Parcel
+            sender: commons.Sender
+            recipient: commons.Recipient
+            parcel: commons.Parcel
       response: ShipmentResponse
       examples:
         - request:
-            sender: $Sender.Example1
-            recipient: $Recipient.Example1
-            parcel: $Parcel.Example1
+            sender: $commons.Sender.Example1
+            recipient: $commons.Recipient.Example1
+            parcel: $commons.Parcel.Example1
           response:
             body:
               status: 200
@@ -83,7 +85,6 @@ service:
               endpoint: /ship_czhgjrk5JaVvyATPDbyURp
 
 types:
-
   LabelSize:
     docs: Specify a label size for the returned shipping label. If not included, we'll use the default shipping label size set from the PackageX Dashboard.
     enum:
@@ -98,102 +99,10 @@ types:
       - name: "a6"
         value: "a6"
 
-  Pagination:
-    docs: The pagination object returned in responses where multiple values are returned
-    properties:
-      limit:
-        type: integer
-        docs: The limit for the responses
-      page:
-        type: integer
-        docs: The current page offset that is being retrieved
-      has_more:
-        type: boolean
-        docs: indicates if there are more values in the database not retrieved in this query
-
   ShipmentResponse:
     extends: commons.Response
     properties:
       data: Shipment
-
-  Address:
-    docs: The PackageX address object
-    properties:
-      id:
-        docs: The ID for this address. Can be passed into any address field in the future to retrieve this exact address.
-        type: string
-      hash:
-        docs: Similar to the address ID, the hash is a unique string that identifies the address but without the line2 property.
-        type: string
-      line1:
-        docs: The first line of the street address.
-        type: string
-      line2:
-        docs: The second line of the street address.
-        type: string
-      city:
-        docs: The name of the city.
-        type: string
-      state:
-        docs: The full name of the state.
-        type: string
-      state_code:
-        docs: The abbreviated code for the state if applicable.
-        type: string
-      country:
-        docs: The full name of the country for this address.
-        type: string
-      country_code:
-        docs: The two character country code for this address.
-        type: string
-      postal_code:
-        docs: The postal code for this address.
-        type: string
-      formatted_address:
-        docs: The full text string of the address.
-        type: string
-      textarea:
-        docs: The full text string of the address without the line2 address. This is useful if using address auto complete that does not provide a line2 address which would be asked for in a separate input field.
-        type: string
-      timezone:
-        docs: The timezone for this address
-        type: string
-      verified:
-        docs: If we have verified this address
-        type: boolean
-    examples:
-      - name: Example1
-        value:
-          id: defnewfed_93392
-          hash: dac0efe_w9dw
-          line1: 500 7th Ave
-          line2: Fl 10
-          city: New York
-          state: New York
-          state_code: NY
-          country: United States
-          country_code: US
-          postal_code: "10018"
-          formatted_address: 500 7th Ave, Fl 10, New York, NY, 10018
-          textarea: 500 7th Ave
-          timezone: EST
-          verified: true
-      - name: Example2
-        value:
-          id: fefewfe_9292
-          hash: efneif_2921
-          line1: 600 B. Street
-          line2: Suite 300
-          city: San Diego
-          state: California
-          state_code: CA
-          country: United States
-          country_code: US
-          postal_code: "90101"
-          formatted_address: 600 B. Street, Suite 300 7th Ave, Fl 10, San Diego, California 90101
-          textarea: 600 B. Street
-          timezone: PST
-          verified: true
 
   Rate:
     docs: The shipping rate object showing the service level, price, and shipping provider information
@@ -213,7 +122,7 @@ types:
       pickup_at:
         docs: Time in epoch seconds when this shipment will be picked up, if that is included in the service of this rate. Will be null otherwise.
         type: optional<integer>
-      provider: Provider
+      provider: commons.Provider
       service_level: ServiceLevel
     examples:
       - name: Example1
@@ -222,7 +131,7 @@ types:
           amount: 1203
           billed_amount: 9023
           service_level: $ServiceLevel.Example1
-          provider: $Provider.Example1
+          provider: $commons.Provider.Example1
 
   ServiceLevel:
     docs: The service level for this rate
@@ -255,44 +164,6 @@ types:
           terms: "Today by 9pm"
           pickup_at: 1679591623
 
-  Provider:
-    docs: Details about a shipping provider for a given rate or shipment
-    properties:
-      name:
-        docs: The name of the provider
-        type: string
-      id:
-        docs: Unique ID of the provider
-        type: string
-      logo_url:
-        docs: The url for the provider's logo
-        type: string
-      support_email:
-        docs: The contact email provided by the shipping provider
-        type: optional<string>
-      support_phone:
-        docs: The contact phone provided by the shipping provider
-        type: optional<string>
-      support_url:
-        docs: The contact website provided by the shipping provider
-        type: string
-      support_reference:
-        docs: A support reference code that some providers use to help customers.
-        type: optional<string>
-      marketplace:
-        docs: If this shipping provider came from the PackageX marketplace. Typically large providers like FedEx, UPS, USPS, etc are not from the marketplace and same-day courier are not.
-        type: boolean
-    examples:
-      - name: Example1
-        value:
-          name: UPS
-          id: 2dij3dn9
-          logo_url: "NA"
-          support_email: support@ups.com
-          support_phone: 1-800-742-5877
-          support_url: https://www.ups.com/us/en/support/contact-us.page
-          marketplace: false
-
   Attributes:
     docs: Indicates certain aspects of the item that will impact shipping and handling
     enum:
@@ -302,200 +173,12 @@ types:
       - dry_ice
       - lithium
 
-  PackageType:
-    docs: The courier specific packaging. See https://docs.packagex.io/shipments/predefined-packages for more information
-    enum:
-      - usps_flat_rate_envelope
-      - usps_flat_rate_window_envelope
-      - usps_small_flat_rate_envelope
-      - usps_flat_rate_padded_envelope
-      - usps_flat_rate_legal_envelope
-      - usps_small_flat_rate_box
-      - usps_medium_flat_rate_box_1
-      - usps_medium_flat_rate_box_2
-      - usps_large_flat_rate_box_1
-      - usps_large_flat_rate_box_2
-      - usps_large_flat_rate_box_apo_fpo
-
-  Parcel:
-    docs: A parcel or package that will be included in a shipment
-    properties:
-      attributes: optional<list<Attributes>>
-      id:
-        docs: The unique ID assigned to the parcel beginning with prcl_
-        type: string
-      length:
-        docs: The length of the package in inches
-        type: integer
-      width:
-        docs: The width of the package in inches
-        type: integer
-      height:
-        docs: The height of the package in inches
-        type: integer
-      weight:
-        docs: The weight of the package in pounds
-        type: integer
-      type: PackageType
-      special_handling:
-        docs: Any special handing instructions provided. Not all shipping providers support these
-        type: optional<string>
-      tracking_number:
-        docs: The tracking number for this parcel if a shipment was purchased
-        type: optional<string>
-      label_url:
-        docs: The shipping label PDF for this parcel if a shipment was purchased
-        type: optional<string>
-      inventory: 
-        docs: The inventory packed inside of the parcel
-        type: commons.Inventory
-    examples:
-      - name: Example1
-        value:
-          id: ebfweufe922828
-          length: 2
-          width: 5
-          height: 4
-          weight: 1
-          type: usps_flat_rate_envelope
-
-  Recipient:
-    docs: The information about the shipment recipient
-    properties:
-      address: Address
-      name:
-        docs: The recipient's name
-        type: string
-      email:
-        docs: The recipient's email
-        type: string
-      phone:
-        docs: The recipient's phone
-        type: string
-      contact_id:
-        docs: The ID of the contact if one was used to create this recipient.
-        type: string
-    examples:
-      - name: Example1
-        value:
-          name: Odin Oliver
-          email: odin.oliver@packagex.io
-          phone: "4844836699"
-          contact_id: fwefwv28281
-          address: $Address.Example2
-
-  Sender:
-    docs: The information about the shipment sender, which is normally the organization using this API
-    properties:
-      address: Address
-      name:
-        docs: The sender's name
-        type: string
-      email:
-        docs: The sender's email
-        type: string
-      phone:
-        docs: The sender's phone
-        type: string
-      contact_id:
-        docs: The sender's unique packagex ID
-        type: string
-    examples:
-      - name: Example1
-        value:
-          name: Jamie Jones
-          email: jamie@packagex.io
-          phone: "4844836699"
-          contact_id: cwnwif2821
-          address: $Address.Example1
-
-  TrackingUpdate:
-    docs: The record of each tracking update from a shipment
-    properties:
-      address: Address
-      status: ShipmentStatus
-      comment:
-        docs: A shipping provider comment
-        type: optional<string>
-      images:
-        docs: Urls of images
-        type: list<string>
-      message:
-        docs: Human readable text explaining the status
-        type: string
-      event:
-        docs: The event that occurred when this event was created. For all events see https://docs.packagex.io/shipments/events
-        type: string
-      created_at:
-        docs: Time from unix eopch seconds when this tracking update was created
-        type: integer
-      updated_at:
-        docs: The time in epoch seconds when this status was last updated
-        type: integer
-      location_id:
-        docs: The ID of the location of this update, if it is one of your locations.
-        type: optional<string>
-      layout_id:
-        docs: The ID of the layout that this item is on, if it matches one of your locations.
-        type: optional<string>
-    examples:
-      - name: Example1
-        value:
-          address: $Address.Example1
-          status: in_transit
-          message: In Transit
-          images: []
-          created_at: 1679591515
-          updated_at: 1679591623
-          event: Your package is in transit
-      - name: Example2
-        value:
-          address: $Address.Example1
-          status: out_for_delivery
-          message: Out for Delivery
-          images: []
-          created_at: 1679591515
-          updated_at: 1679591623
-          event: Your package is out for delivery
-
-  Filters:
-    docs: A sudo status given to the delivery to know what is happening with the delivery.
-    enum:
-      - completed
-      - outstanding
-      - exception
-
   RefundStatus:
     docs: The status of the refund on this shipment if one was requested
     enum:
       - requested
       - refunded
       - rejected
-
-  ShipmentStatus:
-    docs: The current status for the shipment. It's the same status as the latest tracking_update just surfaced for convenience. See https://docs.packagex.io/shipments/statuses for more info on statuses.
-    enum:
-      - rates_generated
-      - created
-      - address_issue
-      - provider_at_pickup
-      - contact_provider
-      - delayed
-      - delivery_attempted
-      - delivery_rescheduled
-      - delivery_scheduled
-      - out_for_delivery
-      - package_accepted
-      - package_at_waypoint
-      - in_transit
-      - pickup_available
-      - provider_at_dropoff
-      - package_damaged
-      - delivered
-      - return_to_sender
-      - package_undeliverable
-      - package_lost
-      - canceled
 
   RateTypes:
     docs: The type of rate that should be returned for the shipment.
@@ -506,7 +189,7 @@ types:
       - provider_delivery
       - offline_delivery
 
-  Options:
+  ShipmentOptions:
     docs: Options that were passed in when generated shipping rates.
     properties:
       provider_timeout:
@@ -542,7 +225,7 @@ types:
         docs: The amount that your organization will be billed for this rate.
         type: optional<integer>
       provider:
-        type: optional<Provider>
+        type: optional<commons.Provider>
       created_at:
         docs: Time in epoch seconds when this shipment was created.
         type: integer
@@ -553,7 +236,7 @@ types:
       estimated_delivery:
         docs: Time in epoch seconds when we estimate the delivery will occur.
         type: optional<integer>
-      filters: list<Filters>
+      filters: list<commons.Filters>
       fulfillment_id:
         docs: The ID of the fulfillment that created this shipment.
         type: string
@@ -561,20 +244,20 @@ types:
         docs: The unique ID for the shipment
         type: string
       refund_status: optional<RefundStatus>
-      status: ShipmentStatus
+      status: commons.ShipmentStatus
       lead_time_mins:
         docs: The amount of lead time needed to prepare the shipment for an on-demand courier. This is only applicable for same-day shipments and indicated how much advance notice is required between the shipping provider and sender before a courier will be dispatched.
         type: integer
       metadata:
         docs: Custom key value pairs that the organization is able to add to this shipment
         type: optional<map<string, unknown>>
-      options: optional<Options>
+      options: optional<ShipmentOptions>
       paid:
         docs: If the shipment has been paid for
         type: boolean
       parcels:
         docs: The individual packages that are part of this shipment.
-        type: list<Parcel>
+        type: list<commons.Parcel>
       payment_reference:
         docs: A user generated reference for this payment. Will be included in invoices.
         type: optional<string>
@@ -582,8 +265,8 @@ types:
       rates:
         docs: All of the rates that were returned when creating this shipment
         type: list<Rate>
-      recipient: Recipient
-      sender: Sender
+      recipient: commons.Recipient
+      sender: commons.Sender
       pickup_at:
         docs: Seconds from epoch when this shipment will be picked up, if pickup is part of the rate's service level
         type: optional<integer>
@@ -608,15 +291,15 @@ types:
       feedback: optional<ShipmentFeedback>
       tracking_updates:
         docs: A list of all tracking updates that occurred for this shipment from oldest to newest
-        type: list<TrackingUpdate>
+        type: list<commons.TrackingUpdate>
       coordinates: list<double>
-      _search: optional<Search>
+      _search: optional<commons.Search>
     examples:
       - name: Example1
         value:
           amount: 1324
           billed_amount: 1023
-          provider: $Provider.Example1
+          provider: $commons.Provider.Example1
           created_at: 1679245915
           updated_at: 1679245933
           currency: usd
@@ -627,17 +310,18 @@ types:
           status: out_for_delivery
           lead_time_mins: 13
           paid: true
-          parcels: [$Parcel.Example1]
+          parcels: [$commons.Parcel.Example1]
           purchased_rate: $Rate.Example1
           rates: [$Rate.Example1]
-          recipient: $Recipient.Example1
-          sender: $Sender.Example1
+          recipient: $commons.Recipient.Example1
+          sender: $commons.Sender.Example1
           organization_id: dwndiwqe22en2
           invoice_id: verwdwdwq3j33x2
           kiosk_id: fcewueek9393
           tracking_number: wefewfwecn290ioieqoi1221239
           tracking_url: https://www.ups.com/track?loc=en_US&requester=ST/
-          tracking_updates: [$TrackingUpdate.Example1, $TrackingUpdate.Example2]
+          tracking_updates:
+            [$commons.TrackingUpdate.Example1, $commons.TrackingUpdate.Example2]
           coordinates: [37.7749, 122.4194]
 
   ShipmentFeedback:
@@ -659,52 +343,6 @@ types:
     enum:
       - usd
 
-  Search:
-    docs: A special property that will be included if searching through shipments.
-    properties:
-      id:
-        docs: The ID of the shipment.
-        type: string
-      tracking_number:
-        docs: The tracking number.
-        type: string
-      sender_name:
-        docs: The sender's name. It will also match common nicknames.
-        type: string
-      sender_email:
-        docs: The sender's email.
-        type: string
-      sender_phone:
-        docs: The sender's phone.
-        type: string
-      sender_formatted_address:
-        docs: The sender's full address string.
-        type: string
-      recipient_name:
-        docs: The recipient's name. It will also match common nicknames.
-        type: string
-      recipient_email:
-        docs: The recipient's email.
-        type: string
-      recipient_phone:
-        docs: The recipient's phone.
-        type: string
-      recipient_formatted_address:
-        docs: The recipient's full address string.
-        type: string
-      provider_name:
-        docs: The shipping provider's name.
-        type: string
-      provider_id:
-        docs: The shipping provider's ID
-        type: string
-      metadata:
-        docs: Any custom metadata that you have added
-        type: optional<map<string, unknown>>
-      relevance_score:
-        docs: A number from 0 - 1 about how relevant the result was to the search query, with 1 being a perfect match.
-        type: double
-
   Error:
     docs: An error response
     properties:
@@ -723,7 +361,7 @@ types:
       errors:
         docs: An list of errors that occurred. Normally will be of the properties that failed validation.
         type: list<string>
-      pagination: Pagination
+      pagination: commons.Pagination
       events:
         docs: All of the events that were triggered due to this request
         type: list<string>

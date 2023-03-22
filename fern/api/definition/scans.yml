@@ -1,9 +1,12 @@
-imports: 
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
   commons: commons.yml
+
 service:
   auth: true
   base-path: /v1/scans
-  endpoints: 
+  endpoints:
     create:
       path: ""
       docs: Create a new scan
@@ -12,35 +15,34 @@ service:
         name: CreateScanRequest
         body:
           properties:
-            image_url: 
+            image_url:
               type: string
               docs: Base64 encoded data URL.
-            type: optional<ScanType> 
-            location_id: 
+            type: optional<ScanType>
+            location_id:
               type: optional<string>
               docs: The ID of the location you want to attribute to this scan.
-            metadata: 
+            metadata:
               type: optional<map<string, unknown>>
               docs: Any custom key-value pairs you want to add to this scan.
-            barcode_values: 
+            barcode_values:
               type: optional<list<string>>
               docs: Any existing values you've already extracted from the barcode.
-            weight: 
+            weight:
               type: optional<double>
               docs: The weight in lbs for this scan, if it was already extracted such as for a shipping label if it was weighed on a scale while taking the scan image.
-            dimensions: optional<Dimensions> 
-            options: optional<Options>
+            dimensions: optional<Dimensions>
+            options: optional<commons.Options>
       response: ScanResponse
       examples:
         - request:
-            body: 
-              image_url: data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAASA... # truncated
-              type: shipping_label
-              barcode_values: []
-              metadata: {}
-              options: 
-                parse_addresses: true
-                match_contacts: true
+            image_url: data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAASA... # truncated
+            type: shipping_label
+            barcode_values: []
+            metadata: {}
+            options:
+              parse_addresses: true
+              match_contacts: true
           response:
             body:
               status: 200
@@ -48,7 +50,8 @@ service:
               message: You created a scan
               errors: []
               endpoint: /
-    retrieve: 
+
+    retrieve:
       docs: Retrieves a specific scan
       method: GET
       path: /{scan}
@@ -56,140 +59,128 @@ service:
         scan: string
       response: ScanResponse
 
-    list: 
+    list:
       docs: Lists multiple scans
       path: ""
       method: GET
       response: ScanResponse
 
-types: 
-  Scan: 
+types:
+  Scan:
     docs: The scan represents a single image that was scanned and data extracted.
-    properties: 
-      created_at: 
+    properties:
+      created_at:
         docs: Time in epoch seconds when this scan was created.
         type: integer
-      contact_matches: ContactMatches
+      contact_matches: optional<ContactMatches>
       dimensions: optional<Dimensions>
-      extracted_labels: ExtractedLabels
-      hash: 
+      extracted_labels: optional<ExtractedLabels>
+      hash:
         docs: A unique hash for this scan that can be used to identify duplicate scans.
         type: string
-      id: 
+      id:
         docs: Unique identifier for the scan.
         type: string
-      image_url: 
+      image_url:
         docs: The URL to the image used for this scan.
         type: string
       location_id:
         docs: The hub location to which this delivery is assigned.
         type: string
-      metadata: 
+      metadata:
         docs: Key value pairs of data that you can set for this scan.
         type: optional<map<string, unknown>>
-      organization_id: 
-        docs: Unique identifier for the organization that owns this scan. 
+      organization_id:
+        docs: Unique identifier for the organization that owns this scan.
         type: string
-      provider_name: 
+      provider_name:
         docs: The name of the shipping provider.
         type: string
-      purchase_order: 
+      purchase_order:
         docs: Any extracted purchase order numbers from the scan.
         type: string
       raw_text:
         docs: The raw text that was extracted from the image with the OCR before being added to the model.
-        type: string
+        type: optional<string>
       recipient:
         docs: Details about the contact receiving this delivery.
-        type: commons.Recipient 
+        type: commons.Recipient
       reference_number:
         docs: Any extracted reference number from the scan.
         type: string
       rma_number:
         docs: Return material authorization if included on the document.
-        type: optional<string> 
-      sender: 
+        type: optional<string>
+      sender:
         docs: Details about the contact sending this delivery.
         type: commons.Sender
-      service_level_name: 
+      service_level_name:
         docs: The name of the service level for this package.
         type: string
       tracking_number:
         docs: Provider-specific string used to track this delivery.
         type: string
       type: ScanType
-      weight: 
+      weight:
         docs: The weight in pounds of the item that was scanned, if exists.
-        type: optional<string> 
+        type: optional<string>
     examples:
       - name: Example1
-        value: 
+        value:
           created_at: 1679245915
-          contact_matches: 
-          extracted_labels: 
           hash: dwqdwqn3b32uiiuiewd
           id: eefeb3bu32432d
           image_url: data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAASA # truncated
-          location_id:
-            docs: The hub location to which this delivery is assigned.
-            type: string
+          location_id: loc_8GiCVuqZqBJi43v2WebaME
           metadata: {}
           organization_id: dwndiwqe22en2
           provider_name: UPS
           purchase_order: ""
-          raw_text:
-            docs: The raw text that was extracted from the image with the OCR before being added to the model.
-            type: string
           recipient: $commons.Recipient.Example1
           reference_number: "325332432533"
           sender: $commons.Sender.Example1
           service_level_name: Same Day
           tracking_number: "435466544243"
           type: shipping_label
+
   ExtractedLabels:
     docs: A list of all labels extracted from the document.
-    enum: 
-     - food
-     - legal_document
-     - pay_stub
-     - confidential
-     - fragile
-     - oversized
-     - time_sensitive
-     - return_to_sender
+    enum:
+      - food
+      - legal_document
+      - pay_stub
+      - confidential
+      - fragile
+      - oversized
+      - time_sensitive
+      - return_to_sender
 
-  ContactMatches: 
-    properties: 
-      senders: list<Sender>
-      recipients: list<Recipient>
-    
-  ScanResponse: 
+  ContactMatches:
+    properties:
+      senders: list<commons.Sender>
+      recipients: list<commons.Recipient>
+
+  ScanResponse:
     extends: commons.Response
-    properties: 
+    properties:
       data: Scan
-  ScanType: 
+
+  ScanType:
     docs: Will default to "shipping_label".
-    enum: 
+    enum:
       - shipping_label
       - manifest
-      - item 
-      - invoice 
-  Dimensions: 
-    properties: 
-      length: 
+      - item
+      - invoice
+
+  Dimensions:
+    properties:
+      length:
         type: double
         docs: The length in inches of this scanned item, if it was measured while taking the scan.
-      width: 
+      width:
         type: double
         docs: The width in inches of this scanned item, if it was measured while taking the scan.
-      height: 
+      height:
         type: double
         docs: The height in inches of this scanned item, if it was measured while taking the scan.
-  Options: 
-    properties: 
-      parse_addresses:
-        type: boolean
-        docs: If the extracted sender and recipient addresses should be run through the address parser.
-      match_contacts: 
-        type: boolean
-        docs: If you want the extracted sender and recipient fields to be matched to existing contacts in your organization.

@@ -164,15 +164,6 @@ types:
           terms: "Today by 9pm"
           pickup_at: 1679591623
 
-  Attributes:
-    docs: Indicates certain aspects of the item that will impact shipping and handling
-    enum:
-      - alcohol
-      - marijuana
-      - pharma
-      - dry_ice
-      - lithium
-
   RefundStatus:
     docs: The status of the refund on this shipment if one was requested
     enum:

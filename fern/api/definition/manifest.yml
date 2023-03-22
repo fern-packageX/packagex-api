@@ -39,9 +39,30 @@ service:
               message: You created a manifest
               errors: []
               endpoint: /v1/manifest
-    # update:
-    #   docs: Before you can update a manifest, you'll need to update its status to accepted.
-
+    updateManifest: 
+      docs: Before you can update a manifest, you'll need to update its status to accepted. When all items have been verified, you are able to update the status of the manifest to 'completed'.
+      path: /{manifest}
+      method: POST
+      path-parameters:
+        manifest: string
+      request: 
+        name: UpdateManifestStatusRequest
+        body: 
+          properties:
+            status: ManifestStatus
+      response: ManifestResponse
+      examples: 
+        - path-parameters:
+            manifest: msft_deuibcud2fwefwec33
+          request:
+            status: accepted
+          response:
+            body: 
+              status: 200
+              data: $Manifest.Example1
+              message: You updated a manifest
+              errors: []
+              endpoint: /v1/manifest/msft_deuibcud2fwefwec33
     retrieve:
       docs: Gets a single manifest
       path: /{manifest}
@@ -103,8 +124,9 @@ types:
       - name: Example1
         value:
           created_at: 1679591515
-          id: deuibcud2fwefwec33
+          id: msft_deuibcud2fwefwec33
           location_id: "loc_afnHMjVUn3gnrvxU5zMvkX"
+          status: accepted
           inventory:
             - id: "item_pu8iNbturZy5zvB4zaUZ8t" # Create by ID
               manifested_qty: 50

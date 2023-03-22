@@ -20,6 +20,23 @@ service:
       path: ""
       method: GET
       response: DeliveryResponse
+    
+    # listMorePages:
+    #   docs: If the has_more property on the pagination object is set to true, you know there are more deliveries in the database that have not been returned to you.
+    #   path: /deliveries?page={page_number}
+    #   path-parameters:
+    #     page_number: integer
+    
+    # search: 
+    #   docs: There are times when filtering is not enough and you want to find a specific delivery by some other attribute. In this case, you can do a fuzzy, typo-tolerant search of every delivery in the database.
+    #   path: /deliveries?search={search_query}
+    #   path-parameters:
+    #     search_query: string 
+    
+    # filter: 
+    #   docs: You can filter deliveries in a number of different ways.
+      ## could be filter, status, rate_types, location 
+
     # update:
     #   docs: You can update the status of the delivery which will typically send notifications to the sender and recipient, depending on what notifications they have enabled. You can also update the coordinates of the delivery without updating the status for a better user experience.
     #   path: /{delivery}

@@ -2,8 +2,8 @@
 
 Tagging a release on this repository will update the:
 
-- [Node.js SDK repo](https://github.com/fern-{company}/{company}-node)
-- _More SDKs to come..._
+- [Node.js SDK repo](https://github.com/fern-packageX/packageX-node)
+- [Postman repo](https://github.com/fern-packageX/packageX-postman)
 
 ## What is in this repository?
 
@@ -14,7 +14,7 @@ This repository contains
 
 ## What is in the API Definition?
 
-The API Definition contains information about what endpoints, types, and errors are used in the API. The definition is broken into smaller files such as [shipments.yml](fern/api/definition/shipments.yml) and [api.yml](fern/api/definition/api.yml).
+The API Definition contains information about what endpoints, types, and errors are used in the API. The definition is broken into smaller files such as [shipments.yml](fern/api/definition/shipment.yml) and [api.yml](fern/api/definition/api.yml).
 
 To make sure that the definition is valid, you can use the Fern CLI.
 

@@ -57,6 +57,12 @@ types:
     docs: | 
       All address objects ids will be prefixed with addr_ to make them easy to distinguish.
 
+  Address: 
+    discriminated: false
+    union: 
+      - string
+      - ParsedAddress
+
   ParseAddressResponse:
     extends: commons.Response
     properties:

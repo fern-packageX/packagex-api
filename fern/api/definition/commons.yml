@@ -37,7 +37,7 @@ types:
   Recipient:
     docs: The information about the shipment recipient
     properties:
-      address: address.ParsedAddress
+      address: address.Address
       name:
         docs: The recipient's name
         type: string
@@ -62,7 +62,7 @@ types:
   Sender:
     docs: The information about the shipment sender, which is normally the organization using this API
     properties:
-      address: address.ParsedAddress
+      address: address.Address
       address_line2: 
         type: optional<string>
       name:

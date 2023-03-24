@@ -9,3 +9,11 @@ groups:
           token: ${FERN_NPM_TOKEN}
         github:
           repository: fern-packageX/packagex-node
+      - name: fernapi/fern-postman
+        version: 0.0.44
+        output:
+          location: postman
+          api-key: ${FERN_POSTMAN_API_KEY}
+          workspace-id: ${FERN_POSTMAN_WORKSPACE_ID}
+        github:
+          repository: fern-packageX/packagex-postman

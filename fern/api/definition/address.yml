@@ -38,7 +38,7 @@ service:
         name: ParseAddressRequest
         body:
           properties:
-            address: Address
+            address: string
       response: ParseAddressResponse
       examples:
         - request:

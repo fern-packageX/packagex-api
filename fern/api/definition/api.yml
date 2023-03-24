@@ -1,4 +1,5 @@
 name: api
+display-name: PackageX API
 auth: apiKey
 auth-schemes:
   apiKey:
@@ -6,5 +7,5 @@ auth-schemes:
     type: string
 environments:
   Production: https://api.packagex.io
-  Sandbox: https://api.packagex.io
+  Sandbox: https://sandbox.packagex.io
 default-environment: Production

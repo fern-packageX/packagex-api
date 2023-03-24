@@ -61,12 +61,6 @@ types:
     extends: commons.Response
     properties:
       data: ParsedAddress
-  
-  Address:
-    discriminated: false
-    union:
-      - string
-      - ParsedAddress
 
   ParsedAddress:
     docs: The PackageX address object

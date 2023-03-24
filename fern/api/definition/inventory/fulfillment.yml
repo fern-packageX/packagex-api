@@ -118,7 +118,7 @@ service:
     deleteParcel:
       docs: If you decide to delete the parcel from the fulfillment, any inventory attributed to that parcel will be removed and reset.
       path: /{fulfillmentId}/parcels/{parcelId}
-      method: POST
+      method: DELETE
       path-parameters:
         fulfillmentId: FulfillmentId
         parcelId: ParcelId

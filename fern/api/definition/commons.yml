@@ -37,7 +37,7 @@ types:
   Recipient:
     docs: The information about the shipment recipient
     properties:
-      address: address.Address
+      address: optional<address.Address>
       name:
         docs: The recipient's name
         type: string
@@ -57,7 +57,21 @@ types:
           email: odin.oliver@packagex.io
           phone: "4844836699"
           contact_id: fwefwv28281
-          address: $address.ParsedAddress.Example2
+          address: 
+            id: fefewfe_9292
+            hash: efneif_2921
+            line1: 600 B. Street
+            line2: Suite 300
+            city: San Diego
+            state: California
+            state_code: CA
+            country: United States
+            country_code: US
+            postal_code: "90101"
+            formatted_address: 600 B. Street, Suite 300 7th Ave, Fl 10, San Diego, California 90101
+            textarea: 600 B. Street
+            timezone: PST
+            verified: true
   
   Sender:
     docs: The information about the shipment sender, which is normally the organization using this API
@@ -84,7 +98,21 @@ types:
           email: jamie@packagex.io
           phone: "4844836699"
           contact_id: cwnwif2821
-          address: $address.ParsedAddress.Example1
+          address: 
+            id: defnewfed_93392
+            hash: dac0efe_w9dw
+            line1: 500 7th Ave
+            line2: Fl 10
+            city: New York
+            state: New York
+            state_code: NY
+            country: United States
+            country_code: US
+            postal_code: "10018"
+            formatted_address: 500 7th Ave, Fl 10, New York, NY, 10018
+            textarea: 500 7th Ave
+            timezone: EST
+            verified: true
 
   Search:
     docs: A special property that will be included if searching through shipments.

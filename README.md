@@ -4,6 +4,7 @@ Tagging a release on this repository will update the:
 
 - [Node.js SDK repo](https://github.com/fern-packageX/packageX-node)
 - [Postman repo](https://github.com/fern-packageX/packageX-postman)
+- [OpenAPI repo](https://github.com/fern-packageX/packageX-openapi)
 
 ## What is in this repository?
 

@@ -1,13 +1,15 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
 
 imports:
-  commons: commons.yml
+  commons: ../commons.yml
+  shipment: ../shipment.yml
 
 service:
   auth: true
   base-path: /v1/fulfillment
   endpoints:
     create:
+      display-name: Create Fulfillment
       docs: Add the required inventory that needs to be shipped to the desired recipient from your specified location.
       path: ""
       method: POST
@@ -21,30 +23,21 @@ service:
               type: string
             inventory:
               docs: The inventory that needs to be shipped in this fulfillment
-              type: list<commons.Inventory>
+              type: list<Inventory>
       response: FulfillmentResponse
       examples:
         - request:
             location_id: "loc_afnHMjVUn3gnrvxU5zMvkX"
-            recipient:
-              name: "Jamie Jones"
-              email: "jamie@packagex.xyz"
-              phone: "4844836699"
-              address: "500 7th Ave, New York, NY 10018"
-              contact_id: cwnwif2821
+            recipient: $commons.Recipient.Example1
             inventory:
-              # If the inventory item is all set up, just the ID and quantity you want to send is required
               - id: "item_5og9NZ92SYzHKFTPYSEnVK"
                 verified_qty: 25
-              # If the item was created but does not have the packaged_* dimensions, they can be entered inline
               - id: "item_1nCNpqtyepe48BMNhzmW54"
                 verified_qty: 50
                 packaged_length: 2
                 packaged_width: 3
                 packaged_height: 4
                 packaged_weight: 6
-              # If an item is not in our inventory system, it can be added without providing an ID. Ideally a SKU or GTIN is added for barcode scanning by the users.
-              # A special, temporary ID will be generated for it with the prefix temp_ to make working with the data easier
               - name: "Custom Item"
                 verified_qty: 5
                 packaged_length: 2
@@ -63,19 +56,19 @@ service:
 
     createParcel:
       docs: Add the box or boxes into which you're going to pack the inventory items.
-      path: /{fulfillment}/parcels
+      path: /{fulfillmentId}/parcels
       path-parameters:
-        fulfillment: string
+        fulfillmentId: FulfillmentId
       method: POST
       request:
         name: CreateParcelRequest
         body:
           properties:
-            parcel: commons.Parcel
+            parcel: Parcel
       response: FulfillmentResponse
       examples:
         - path-parameters:
-            fulfillment: ful_dwdh3239ubcejbcjd
+            fulfillmentId: ful_dwdh3239ubcejbcjd
           request:
             parcel:
               id: prcl_dneidn333brb3jrj3b
@@ -92,21 +85,21 @@ service:
 
     packParcel:
       docs: Pack the items into the parcel(s) that you have added.
-      path: /{fulfillment}/parcels/{parcel}
+      path: /{fulfillmentId}/parcels/{parcelId}
       method: POST
       path-parameters:
-        fulfillment: string
-        parcel: string
+        fulfillmentId: FulfillmentId
+        parcelId: ParcelId
       request:
         name: PackParcelRequest
         body:
           properties:
-            inventory: list<commons.Inventory>
+            inventory: list<Inventory>
       response: FulfillmentResponse
       examples:
         - path-parameters:
-            fulfillment: ful_dwdh3239ubcejbcjd
-            parcel: prcl_fnweifnief9292
+            fulfillmentId: ful_dwdh3239ubcejbcjd
+            parcelId: prcl_fnweifnief9292
           request:
             inventory:
               - id: "item_1nCNpqtyepe48BMNhzmW54"
@@ -124,16 +117,16 @@ service:
 
     deleteParcel:
       docs: If you decide to delete the parcel from the fulfillment, any inventory attributed to that parcel will be removed and reset.
-      path: /{fulfillment}/parcels/{parcel}
+      path: /{fulfillmentId}/parcels/{parcelId}
       method: POST
       path-parameters:
-        fulfillment: string
-        parcel: string
+        fulfillmentId: FulfillmentId
+        parcelId: ParcelId
       response: commons.Response
       examples:
         - path-parameters:
-            fulfillment: ful_dwdh3239ubcejbcjd
-            parcel: prcl_fnweifnief9292
+            fulfillmentId: ful_dwdh3239ubcejbcjd
+            parcelId: prcl_fnweifnief9292
           response:
             body:
               status: 200
@@ -143,9 +136,9 @@ service:
 
     update:
       docs: Mark the fulfillment as packed.
-      path: /{fulfillment}
+      path: /{fulfillmentId}
       path-parameters:
-        fulfillment: string
+        fulfillmentId: FulfillmentId
       method: POST
       request:
         name: UpdateFulfillmentRequest
@@ -155,7 +148,7 @@ service:
       response: FulfillmentResponse
       examples:
         - path-parameters:
-            fulfillment: ful_dwdh3239ubcejbcjd
+            fulfillmentId: ful_dwdh3239ubcejbcjd
           request:
             status: "packed"
           response:
@@ -167,6 +160,8 @@ service:
               endpoint: /v1/fulfillment/{fulfillment}
 
 types:
+  FulfillmentId: string
+
   FulfillmentResponse:
     extends: commons.Response
     properties:
@@ -186,10 +181,10 @@ types:
         type: optional<integer>
       id:
         docs: The unique ID given to this fulfillment prefixed with ful_
-        type: string
+        type: FulfillmentId
       inventory:
         docs: The inventory that needs to be shipped in this fulfillment
-        type: list<commons.Inventory>
+        type: list<Inventory>
       label_url:
         docs: The URL of the shipping label that gets generated when the fulfillment is completed
         type: optional<string>
@@ -213,7 +208,7 @@ types:
         type: optional<list<string>>
       parcels:
         docs: All parcels in the fulfillment and the inventory packed within them
-        type: optional<list<commons.Parcel>>
+        type: optional<list<Parcel>>
       rates_generated_at:
         docs: Time in epoch seconds when shipping rates were generated for this fulfillment. Shipping rates are only valid for 15 minutes after which new rates must be fetched.
         type: optional<integer>
@@ -237,12 +232,7 @@ types:
           id: ful_dwdh3239ubcejbcjd
           created_at: 1679591515
           location_id: "loc_afnHMjVUn3gnrvxU5zMvkX"
-          recipient:
-            name: "Jamie Jones"
-            email: "jamie@packagex.xyz"
-            phone: "4844836699"
-            address: "500 7th Ave, New York, NY 10018"
-            contact_id: cwnwif2821
+          recipient: $commons.Recipient.Example1
           inventory:
             - id: "item_5og9NZ92SYzHKFTPYSEnVK"
               verified_qty: 25
@@ -271,12 +261,7 @@ types:
               length: 10
               width: 10
               height: 10
-          recipient:
-            name: "Jamie Jones"
-            email: "jamie@packagex.xyz"
-            phone: "4844836699"
-            address: "500 7th Ave, New York, NY 10018"
-            contact_id: cwnwif2821
+          recipient: $commons.Recipient.Example1
           inventory:
             - id: "item_5og9NZ92SYzHKFTPYSEnVK"
               verified_qty: 25
@@ -309,12 +294,7 @@ types:
               inventory:
                 id: "item_1nCNpqtyepe48BMNhzmW54"
                 verified_qty: 2
-          recipient:
-            name: "Jamie Jones"
-            email: "jamie@packagex.xyz"
-            phone: "4844836699"
-            address: "500 7th Ave, New York, NY 10018"
-            contact_id: cwnwif2821
+          recipient: $commons.Recipient.Example1
           inventory:
             - id: "item_5og9NZ92SYzHKFTPYSEnVK"
               verified_qty: 25
@@ -351,3 +331,118 @@ types:
       - locker_pickup
       - provider_delivery
       - offline_delivery
+  
+  Inventory:
+    docs: An inventory model is an item or asset that is inside of a manifest, fulfillment, or parcel.
+    properties:
+      attributes: optional<InventoryAttributes>
+      comment:
+        docs: A free text field to add any comments about this item
+        type: optional<string>
+      created_at:
+        docs: Time in epoch seconds when this resource was created
+        type: optional<integer>
+      verified_qty:
+        docs: The amount of on hand inventory.
+        type: optional<integer>
+      damaged_qty:
+        docs: The amount of on hand inventory that is deemed damaged
+        type: optional<integer>
+      manifested_qty:
+        docs: The amount of inventory that is on a manifest that has not been added to inventory yet
+        type: optional<integer>
+      harmonized_code:
+        docs: The harmonized system code for the item. This is required if you will be shipping this item internationally.
+        type: optional<string>
+      id:
+        docs: The unique ID given to this product. This will stay the same even if the SKU or GTIN values are updated.
+        type: optional<string>
+      gtin:
+        docs: The global identifier for the item, which is consistent across vendors for this item
+        type: optional<string>
+      sku:
+        docs: The unique identifier that is added by you for this item
+        type: optional<string>
+      serial_number:
+        docs: A unique number given to an asset
+        type: optional<string>
+      image_url:
+        docs: A thumbnail image for the inventory
+        type: optional<string>
+      name:
+        docs: The name of the item
+        type: optional<string>
+      origin_country:
+        docs: The country that manufactured this item. This is required if shipping the item internationally
+        type: optional<string>
+      vendor:
+        docs: The company that created the inventory
+        type: optional<string>
+      value:
+        docs: The value of this each individual item in cents
+        type: optional<integer>
+      packaged_length:
+        docs: The length of the item in inches when placed in shipping packaging
+        type: optional<double>
+      packaged_width:
+        docs: The width of the item in inches when placed in shipping packaging
+        type: optional<double>
+      packaged_height:
+        docs: The height of the item in inches when placed in shipping packaging
+        type: optional<double>
+      packaged_weight:
+        docs: The weight of the item in pounds (lbs) when placed in shipping packaging
+        type: optional<double>
+  
+  InventoryAttributes:
+    docs: A list of enumerated strings to give more context to special items.
+    enum:
+      - alcohol
+      - marijuana
+      - pharma
+      - dry_ice
+      - lithium
+  
+  ParcelId: string
+
+  Parcel:
+    docs: A parcel or package that will be included in a shipment
+    properties:
+      attributes: optional<list<InventoryAttributes>>
+      id:
+        docs: The unique ID assigned to the parcel beginning with prcl_
+        type: ParcelId
+      length:
+        docs: The length of the package in inches
+        type: integer
+      width:
+        docs: The width of the package in inches
+        type: integer
+      height:
+        docs: The height of the package in inches
+        type: integer
+      weight:
+        docs: The weight of the package in pounds
+        type: optional<integer>
+      type: optional<shipment.PackageType>
+      special_handling:
+        docs: Any special handing instructions provided. Not all shipping providers support these
+        type: optional<string>
+      tracking_number:
+        docs: The tracking number for this parcel if a shipment was purchased
+        type: optional<string>
+      label_url:
+        docs: The shipping label PDF for this parcel if a shipment was purchased
+        type: optional<string>
+      inventory:
+        docs: The inventory packed inside of the parcel
+        type: optional<Inventory>
+    examples:
+      - name: Example1
+        value:
+          id: ebfweufe922828
+          length: 2
+          width: 5
+          height: 4
+          weight: 1
+          type: usps_flat_rate_envelope

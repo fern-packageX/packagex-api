@@ -1,7 +1,8 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
 
 imports:
-  commons: commons.yml
+  commons: ../commons.yml
+  fulfillment: fulfillment.yml
 
 service:
   auth: true
@@ -10,6 +11,7 @@ service:
     create:
       path: ""
       method: POST
+      display-name: Create Item
       request:
         name: CreateItemRequest
         body:
@@ -54,10 +56,11 @@ service:
               endpoint: /v1/items
 
     update:
+      display-name: Update Item
       docs: Updates a single item. When updating inventory, you increment and decrement quantities by passing in positive and negative integers. Lastly, you can optionally provide a layout value to be more specific about the item's exact whereabouts in that location
-      path: /{item}
+      path: /{itemId}
       path-parameters:
-        item: string
+        itemId: ItemId
       method: POST
       request:
         name: UpdateItemRequest
@@ -70,7 +73,7 @@ service:
       response: ItemResponse
       examples:
         - path-parameters:
-            item: item.id
+            itemId: given-item-id
           request:
             name: "Updated Name"
             levels:
@@ -89,29 +92,31 @@ service:
               endpoint: /v1/item/{item}
 
     retrieve:
+      display-name: Retrieve Item
       docs: Gets a single item
-      path: /{item}
+      path: /{itemId}
       path-parameters:
-        item: string
+        itemId: string
       method: GET
       response: ItemResponse
 
     list:
+      display-name: List Items
       docs: Gets all items
       path: ""
       method: GET
-      response: ItemResponse
+      response: ListItemResponse
 
     delete:
       docs: deletes a single item
-      path: /{item}
+      path: /{itemId}
       path-parameters:
-        item: string
+        itemId: ItemId
       method: DELETE
       response: commons.Response
       examples:
         - path-parameters:
-            item: debebw3933hden
+            itemId: debebw3933hden
           response:
             body:
               status: 200
@@ -120,14 +125,21 @@ service:
               endpoint: /v1/item/{item}
 
 types:
+  ItemId: string
+
   ItemResponse:
     extends: commons.Response
     properties:
       data: Item
+  
+  ListItemResponse: 
+    extends: commons.Response
+    properties:
+      data: list<Item>
 
   Item:
     properties:
-      attributes: optional<commons.Attributes>
+      attributes: optional<fulfillment.InventoryAttributes>
       color:
         docs: Any value can be added here
         type: optional<string>
@@ -145,7 +157,7 @@ types:
         type: optional<string>
       id:
         docs: The unique ID given to this product. This will stay the same even if the SKU or GTIN values are updated.
-        type: string
+        type: ItemId
       images:
         docs: A list of URLs of images that have been added for this item
         type: optional<list<string>>
@@ -188,7 +200,7 @@ types:
       organization_id:
         docs: The unique identifier for the organization that owns this item. This will always be your organization ID
         type: optional<string>
-      status: commons.ShipmentStatus
+      status: optional<string>
       size:
         docs: The size of the item. This is used for display purposes on a product page. This is common when adding something like a "small" or "large" variation.
         type: optional<string>
